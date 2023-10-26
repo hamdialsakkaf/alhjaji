@@ -1,0 +1,198 @@
+.App {
+  text-align: center;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+.container {
+  background-color: #1C1E4B;
+
+}
+.body{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.navbar{
+  width:100%;
+  height:80px;
+  background-color: #1C1E4B;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar .links{
+font-size: 25px;
+color: rgb(255, 255, 255);
+border:1px solid #ffffff;
+
+}
+.links a{
+margin: 10px;
+text-decoration: none;
+color: rgb(241, 241, 241);
+}
+
+.links a:hover{
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.uploadPost{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  width: 500px;
+  border: 2px solid coral;
+}
+
+.CreatePost {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh -80px);
+}
+
+.uploadPost input {
+  width: 80%;
+  height: 50px;
+  margin: 10px;
+  outline: none;
+  font-size: 20px;
+}
+
+.uploadPost textarea{
+  height: 120px;
+  width: 80%;
+  margin: 10px;
+}
+
+button{
+  margin: 10px;
+}
+
+.MainPage{
+  display: flex;
+  justify-content: center;
+  height: calc(100vh -80px);
+ 
+}
+
+.PostContainer{
+  height: calc(100vh -80px);
+  width: 100%;
+  max-width: 100%;
+  padding:30px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #ffffff;
+  box-shadow: 2px 1px 8px black;
+  border:1px solid lightslategrey;
+  color: #ffffff;
+}
+
+.brandContainer{
+  height: calc(100vh -80px);
+  width: 100%;
+  text-align: center;
+  max-width: 100%;
+  display: flex;
+  margin: 10px;
+  padding-top: 20px;
+  justify-content: center;
+  flex-direction: column;
+  color: #ffffff;
+}
+.Post{
+ width:100%;
+ display: flex;
+ flex-direction: column;
+ justify-content: flex-start;
+ padding-left: 10px;
+ border:1px solid lightslategrey;
+}
+
+.TireContainer{
+  flex: 1;
+  flex-direction: row;
+  height: calc(100vh -80px);
+  width: 100%;
+  max-width: 100%;
+  padding:30px;
+  display: flex;
+  justify-content: center;
+  background-color: rgb(3, 81, 107);
+  box-shadow: 2px 1px 8px black;
+  border:1px solid lightslategrey
+}
+
+.Tire{
+  width:100%;
+  margin-top:20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-left: 10px;
+  border:1px solid rgb(241, 241, 241);
+  color: white;
+ }
+ 
+ .TireBlock{
+  margin-top:20px;
+  flex: 1;
+ 
+  padding-left: 10px;
+  border:1px solid rgb(241, 241, 241);
+  color: white;
+ }
+ .TireBlock img {
+  width: 90%;
+  height: 50%;
+  justify-content: flex-end;
+ }
+.post-title{
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.link-buy:link, .link-buy:visited {
+  background-color: #f44336;
+  color: white;
+  padding: 14px 25px ;
+  text-align: center;
+  text-decoration: none;
+  
+  display: inline-block;
+  border-radius: 5px;
+  width: 80px;
+  height: 30px;
+}
+
+.link-buy:hover, .alink-buy:active {
+  background-color: rgb(2, 116, 12);
+}
+
+.Post.individual{
+  background-color: rgb(170, 164, 162);
+  max-width: 60%;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.like_btn{
+  width:13%;
+  float: left;
+  margin-bottom: 10px;
+}
+
+.footer{
+  width:100%;
+  height:80px;
+  background-color: #1C1E4B;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
