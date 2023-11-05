@@ -20,7 +20,7 @@ function HomePage() {
 
     let [tire, setTire] = useState("⬇️ Select a tire ⬇️")
     let [tiresize, setTireSize] = useState("⬇️ Select a tire Size ⬇️")
-    const [tireList, setTireList]=useState([]);
+    let [tireList, setTireList]=useState([]);
 
     let [tiresOnSize, setTireOnSize] = useState([])
     let [DolarexchangeRial, setDolarexchangeRial] = useState()
@@ -31,12 +31,28 @@ function HomePage() {
     const navigate = useNavigate();
 
   //const response = await Axios.request(config);
-  
+
+
+
     useEffect(()=> {
-       axios.get('http://localhost:5000/api/getire',
-        //{headers: {'content-type': 'application/x-www-form-urlencoded'}}
-      ).then((data)=>{
-        setTireList(data.data)
+      //axios.get('https://api.agtco.info/api/getire',
+
+      // using proxy url
+      axios.get('getire',
+       //axios.get('http://api.agtco.info/api/getire',
+       //axios.get('https://alhjaji.com:5000/api/getire',
+       //headers: {'X-Requested-With': 'XMLHttpRequest'},
+       //{headers: {'X-Requested-With': 'XMLHttpRequest'}}
+      //{accept: 'application/json',} ,
+     
+        //{headers: {'content-type': 'application/json'}}
+      ).then((res)=>{
+        //setTireList(res.data.data)
+        setTireList(res.data)
+
+        //setTireList(res.data.json())
+        //.then(resdata => console.log(resdata))
+        //.catch(err => console.log(err))
 
       })
 
@@ -44,16 +60,19 @@ function HomePage() {
     
   //}
         useEffect(()=>{
-          axios.get(`http://localhost:5000/api/getFromTireSize/${tiresize}`).then((data)=>{
+          axios.get(`/getFromTireSize/${tiresize}`).then((data)=>
+          {
+
             //axios.get(`https://alhjaji.com/server/api/getFromTireSize/${tiresize}`, {
               //mode: 'cors',
               //headers: { "Content-Type": "application/json","charset":"utf-8" },
+
               setTireOnSize(data.data)
         })
           },[tiresize])
 
         const yemeniRials = ()=> {
-          axios.get(`http://localhost:5000/api/getexchangeDolar`).then((data)=>{
+          axios.get(`/getexchangeDolar`,{headers: {'X-Requested-With': 'XMLHttpRequest'}}).then((data)=>{
             //axios.get(`https://alhjaji.com/api/getexchangeDolar`, {
              //axios.get(`https://api.alhjaji.com/api/getexchangeDolar`, {
 

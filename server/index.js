@@ -1,29 +1,39 @@
 const express = require("express")
+const https = require('https');
+const fs = require('fs');
+const bodyParser = require('body-parser')
+const app = express();
+const helmet = require('helmet')
+
 const cors = require('cors');
 
-const db = require('./config/db')
-const dotenv = require("dotenv")
+const db = require('./db')
+//const dotenv = require("dotenv")
 //dotenv.config()
+require('dotenv').config()
+//console.log(process.env)
 // from vedio
 //const config = require("./config/db")
 //const { port, allowedDomains }  = config
-const PORT = process.env.PORT || 5000;
+//const PORT = process.env.PORT || 5000;
+let PORT;
+
 const bcrypt = require('bcrypt');
-var bodyParser = require('body-parser')
-var path = require("path")
-const app = express()
+var path = require("path");
+const { env } = require("process");
 // 👇️ configure CORS
 app.use(cors());
-app.use((_req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', '*');
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
   });
-  app.use(cors({
-    origin: '*',    
-}));
-app.use(express.json())
 
+app.use(express.json())
+console.log('host', process.env.HOST)
 /*
 app.use(cors({
     origin: '*' , 
@@ -42,9 +52,10 @@ app.use(cors({
 const compressing = require('compressing');
 app.use(compressing())
 */
+app.use(helmet())
 app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.urlencoded({ extended: true })); // support url-encoded bodies
-
+//app.use(bodyParser.urlencoded({ extended: true })); // x-www-form-urlencoded support url-encoded bodies
+app.use(bodyParser.json()); // application/json
 app.use(express.static(path.join(__dirname, '/public')));
 /*
 app.get('/*', function (req, res) {
@@ -57,7 +68,7 @@ app.get('/*', function (req, res) {
 const PORT = 3000;
 // from vedio
 //app.use(cors({origin: allowedDomains, credentials: true }))
-//app.use(helmet())
+
 app.use(express.json())
 //app.use(cors({ origin: 'https://alhjaji.com/', credentials: true }));
 //app.use(cors({ origin: process.env.REMOTE_CLIENT_APP, credentials: true }));
@@ -67,7 +78,10 @@ app.use(cors({
     origin: ['https://alhjaji.com', 'http://alhjaji.com/']
 }));
 */
- 
+ //GET home route
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
 // Middleware Function to authenticate the user
 const auth = (req, res, next) => {
     console.log(req.body);
@@ -106,7 +120,8 @@ app.get("/api/get", (req, res) => {
 });
 
 // Route to get all tires
-app.get("/api/getire",(req, res) => {
+app.get("/getire",(req, res) => {
+
     //res.set('Access-Control-Allow-Origin', '*');
     //res.set('Access-Control-Allow-Headers', 'no-cache');
     //res.set('cache', '*');
@@ -124,7 +139,7 @@ app.get("/api/getire",(req, res) => {
 });
 
 // Route to get one post
-app.get("/api/getFromId/:id", (req,res)=>{
+app.get("/getFromId/:id", (req,res)=>{
     //res.set('Access-Control-Allow-Origin', '*');
     //res.set('Access-Control-Allow-Headers', '*');
 
@@ -139,7 +154,7 @@ app.get("/api/getFromId/:id", (req,res)=>{
 });
 
 // Route to get one tire
-app.get("/api/getFromTireId/:id", (req,res)=>{
+app.get("/getFromTireId/:id", (req,res)=>{
     //res.set('Access-Control-Allow-Origin', '*');
    // res.set('Access-Control-Allow-Headers', '*');
     const id = req.params.id;
@@ -321,49 +336,32 @@ app.post('/api/like/:id',cors(),(req,res)=>{
       
     })
     
-   
+
+process.env.STATUS === 'production'
+        ? (PORT = process.env.PROD_PORT)
+        : (PORT = process.env.DEV_PORT);
+
+process.env.STATUS === 'production'
+        ? (HOST = process.env.PROD_HOST)
+        : (HOST = process.env.HOST);
+
+    process.env.STATUS === 'production'
+        ? (USER = process.env.PROD_USER)
+        : (USER = process.env.USER);
+      
+    process.env.STATUS === 'production'
+        ? (PASSWORD = process.env.PROD_PASSWORD)
+        : (PASSWORD = process.env.PASSWORD);
+
+//app.listen(process.env.PORT || 3000)
+    app.listen()
+//https.createServer(app).listen(3000)
 /*
-       if (email ) {
-        console.log(email+'='+ emailAuth)
-    }
-    if (passowrd ) {
-        console.log(passowrd+'='+ passowrdAuth)
-        res.send(result)
-    } else {
-        res.send(err)
-    }
-    */
-    //})
-       
-    
-  /*
-    let myPromise = new Promise(function(myResolve, myReject) {
-        let x = 0;
-      
-      // some code (try to change x to 5)
-      if (email = emailAuth) {
-        myResolve("OK");
-      } else {
-          myReject("Error");
-        }
-      });
-      
-      myPromise.then(
-        function(value) {
-            if (passowrd = passowrdAuth) {
-                res.send(reault)
-            }
-            myDisplayer(value);
-        },
-        function(error) {myDisplayer(error);}
-      );
-  */
-//})
-
-
-app.listen(PORT, function(err){
-    if (err) console.log("Error in server setup")
-    console.log("Server listening on Port", PORT);
-})
-
-   // app.listen()
+// we will pass our 'app' to 'https' server
+https.createServer({
+    key: fs.readFileSync('./key.pem'),
+    cert: fs.readFileSync('./cert.pem'),
+    passphrase: 'ahmed'
+}, app)
+.listen(3001);
+*/

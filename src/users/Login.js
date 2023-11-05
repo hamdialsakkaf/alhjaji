@@ -45,7 +45,9 @@ function Login() {
                 email: email,
                 passowrd: hashedPassword
             }
-            await axios.post('http://localhost:5000/api/login', 
+            //await axios.post('https://api.agtco.info/api/login', 
+            await axios.post('/login', 
+
                 user
                      
             ).then((data)=>{

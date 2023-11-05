@@ -31,7 +31,7 @@ function Register() {
                 email: email,
                 password: hashedPassword,
             }
-            await axios.post('http://localhost:5000/api/users', 
+            await axios.post('https://alhjaji.com:3306/api/users', 
             user,
        
             ).then((res)=> {

@@ -10,7 +10,7 @@ const Navbar = () => {
     const Logout = async () => {
         try {
            // await axios.delete('http://localhost:5000/logout');
-            await Axios.delete('http://localhost:5000/api/logout',{
+            await Axios.delete('https://alhjaji.com:3000/api/logout',{
                 mode: 'cors',
                 headers: {
                  "Content-Type": "text/html",
