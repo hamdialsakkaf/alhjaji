@@ -1,4 +1,4 @@
-import React,{useState,useEffect, useCallback } from 'react'
+import React,{useState,useEffect } from 'react'
 import axios from 'axios';
 //import Axios from  'axios'
 //from vedio
@@ -29,50 +29,79 @@ function HomePage() {
 
     //let history = useNavigate();
     const navigate = useNavigate();
+    
+    const options = {
+      headers: {'accept': 'application/json'},
+      //headers: {'content-type': 'text/html'},
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      headers: {'X-Content-Type-Options': 'nosniff '},
+      headers: {'x-requested-with': 'XMLHttpRequest'},
+      headers: {'x-content-type-options': 'nosniff '},
+      headers: {'x-content-type-options': 'no-sniff '},
+
+    };
 
   //const response = await Axios.request(config);
 
+  /*
+  const data = JSON.stringify({
+  ...
+  });
+  */
+
+  /*
+  const response = await axios.post('https://someendpoint', data, axiosConfig).then(r => {
+    console.log('r', r);
+  })
+       */ 
+
+  // رسمي من الموقع جربه
+/*
+const instance = axios.create({
+  baseURL: 'https://some-domain.com/api/',
+  timeout: 1000,
+  headers: {'X-Custom-Header': 'foobar'}
+});
+  */
 
 
-    useEffect(()=> {
-      //axios.get('https://api.agtco.info/api/getire',
 
-      // using proxy url
-      axios.get('getire',
-       //axios.get('http://api.agtco.info/api/getire',
-       //axios.get('https://alhjaji.com:5000/api/getire',
-       //headers: {'X-Requested-With': 'XMLHttpRequest'},
-       //{headers: {'X-Requested-With': 'XMLHttpRequest'}}
-      //{accept: 'application/json',} ,
-     
-        //{headers: {'content-type': 'application/json'}}
-      ).then((res)=>{
+    useEffect(()=>  {
+
+       //axios.get('/getire',
+       axios.get('https://nodejsclusters-155029-0.cloudclusters.net/api/getire')
+       .then((res)=>{
         //setTireList(res.data.data)
-        setTireList(res.data)
-
-        //setTireList(res.data.json())
-        //.then(resdata => console.log(resdata))
-        //.catch(err => console.log(err))
-
-      })
+        res.json().then((data)=> {
+          console.log(data)
+          setTireList(data)
+        })}
+        ).catch((err) => console.log('err getire:',err));
+        //setTireList(res.data)
 
     },[])
     
   //}
         useEffect(()=>{
-          axios.get(`/getFromTireSize/${tiresize}`).then((data)=>
+          //axios.get(`https://api.alhjaji.com/getFromTireSize/${tiresize}`).then((data)=>
+          axios.get(`https://nodejsclusters-155029-0.cloudclusters.net/api/getFromTireSize/${tiresize}`).then((res)=>
           {
+            setTireOnSize(res.data)
+            .then((data) => {
+              if (data.error) {
+                console.log(data.error)
+              } else {
+                setTireOnSize(data)
 
-            //axios.get(`https://alhjaji.com/server/api/getFromTireSize/${tiresize}`, {
-              //mode: 'cors',
-              //headers: { "Content-Type": "application/json","charset":"utf-8" },
+              }
+             //setTireOnSize(data.data)
 
-              setTireOnSize(data.data)
+            })
         })
           },[tiresize])
 
         const yemeniRials = ()=> {
-          axios.get(`/getexchangeDolar`,{headers: {'X-Requested-With': 'XMLHttpRequest'}}).then((data)=>{
+          axios.get(`/getexchangeDolar`).then((data)=>{
             //axios.get(`https://alhjaji.com/api/getexchangeDolar`, {
              //axios.get(`https://api.alhjaji.com/api/getexchangeDolar`, {
 
