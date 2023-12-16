@@ -1,24 +1,27 @@
 const express = require("express")
 const cors = require('cors');
 
-const db = require('./db')
-const dotenv = require("dotenv")
+const db = require('./config/db')
+//const dotenv = require("dotenv")
 //dotenv.config()
 // from vedio
 //const config = require("./config/db")
 //const { port, allowedDomains }  = config
 const PORT = process.env.PORT || 5000;
+const bcrypt = require('bcrypt');
 var bodyParser = require('body-parser')
 var path = require("path")
 const app = express()
 // 👇️ configure CORS
 app.use(cors());
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+app.use((_req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
     next();
   });
-
+  app.use(cors({
+    origin: '*',    
+}));
 app.use(express.json())
 
 /*
@@ -107,7 +110,7 @@ app.get("/api/getire",(req, res) => {
     //res.set('Access-Control-Allow-Origin', '*');
     //res.set('Access-Control-Allow-Headers', 'no-cache');
     //res.set('cache', '*');
-    res.set('Content-Type', 'application/json');
+    //res.set('Content-Type', 'application/json');
     //res.setHeader('Cache-Control', 'public')
     db.query("SELECT * FROM tires LIMIT 4", (err, result) => {
         if(err) {
@@ -358,78 +361,6 @@ app.post('/api/like/:id',cors(),(req,res)=>{
 //})
 
 
-
-
-/*
-var httpProxy = require('http-proxy');
-
-var proxy_web = new httpProxy.createServer({
-    target: "http://localhost:8080/",
-    secure: true
-})
-
-var proxy_api = new httpProxy.createServer({
-    target: "http://localhost:8081/",
-    secure: true,
-})
-https.createServer(
-    {
-        key: fs.readFileSync("server.key"),
-        cert: fs.readFileSync("server.crt"),
-        ca: fs.readFileSync("serverCA.ca-bundle"),
-    },
-    function(req, res) {
-        try {
-            if (req.headers.host === "api.alhjaji.com") {
-                if(!req.url.includes("/api"))
-                {
-                    proxy_web.proxyRequest(req, res);
-                    proxy_web.on("response", (remoteRes) => {
-                        res.writeHead(remoteRes.statusCode, remoteRes.headers);
-                        remoteRes.pipe(res);
-                    });
-                    proxy_web.on("error", function(err, req,res){
-                        if (err) console.log(err);
-                        res.writeHead(500);
-                        res.end("Oops, something went very wrong...");
-                    });
-                }
-                else {
-                    req.url = req.url.replace('/api', '/')
-                    proxy_api.proxyRequest(req, res);
-                    proxy_api.on("response", (remoteRes) => {
-                        res.writeHead(remoteRes.statusCode, remoteRes.headers);
-                        remoteRes.pipe(res);
-                    });
-                    proxy_api.on("error", function (err, req, res) {
-                        if (err) console.log(err);
-                        res.writeHead(500);
-                        res.end("Oops, something went very wrong...");
-                    });
-                }
-            } else if (req.headers.host === "api.alhjaji.com") {
-                proxy_api.proxyRequest(req, res);
-                proxy_api.on("response", (remoteRes)=> {
-                    res.writeHead(remoteRes.statusCode, remoteRes.headers);
-                    remoteRes.pipe(res);
-                });
-                proxy_api.on("error", function (err, req, res) {
-                    if (err) console.log(err);
-                    res.writeHead(500);
-                    res.end("Oops, something went very wrong...");
-                });
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    
-)
-.listen(443, function () {
-    console.log("App is running on the port", 443)
-})
-
-*/
 app.listen(PORT, function(err){
     if (err) console.log("Error in server setup")
     console.log("Server listening on Port", PORT);

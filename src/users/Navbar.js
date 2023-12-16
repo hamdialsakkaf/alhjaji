@@ -1,6 +1,6 @@
 import React from 'react'
-//import axios from 'axios';
-import  Axios  from '../config'
+import axios from 'axios';
+//import  Axios  from '../config'
 //import { useHistory } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,19 +8,27 @@ const Navbar = () => {
     const history = useNavigate();
  
     const Logout = async () => {
-        try {
-           // await axios.delete('http://localhost:5000/logout');
-            await Axios.delete('https://alhjaji.com:3000/api/logout',{
-                mode: 'cors',
-                headers: {
-                 "Content-Type": "text/html",
-             },
-               });
-            history.push("/");
-        } catch (error) {
-            console.log(error);
+        if(localStorage.getItem("login")){
+            const login = JSON.parse(localStorage.setItem("login",false))
+            console.log('logOut:', login)
+           // setAuth(login);
+             return login;
         }
-    }
+            }
+/*
+    const Logout = async () => {
+        await axios.delete('http://api.imagemarketing.net/logout')
+            //await axios.delete('http://api.imagemarketing.net/logout')
+            .then(res => {
+                history.push("/");
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log(error.response.data);
+                }
+            })
+            }
+*/
  
     return (
         <nav className="navbar is-light" role="navigation" aria-label="main navigation">

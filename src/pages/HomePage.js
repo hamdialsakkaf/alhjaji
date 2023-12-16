@@ -1,9 +1,10 @@
 import React,{useState,useEffect } from 'react'
 import axios from 'axios';
-//import Axios from  'axios'
-//from vedio
-//import  Axios  from '../config'
 import {useNavigate} from 'react-router-dom'
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import Table from 'react-bootstrap/Table';
@@ -11,106 +12,60 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Nav from 'react-bootstrap/Nav';
-import Container from 'react-bootstrap/Container';
-import '../App.css'
+import '../App.css';
 //Axios.defaults.baseurl = process.env.react_app_be_url;
+  const HomePage = () => {
 
-function HomePage() {
-  const [error, setError] = useState(null);
-
+//function HomePage() {
+  //const [error, setError] = useState(null);
+  const [error] = useState(null);
     let [tire, setTire] = useState("⬇️ Select a tire ⬇️")
     let [tiresize, setTireSize] = useState("⬇️ Select a tire Size ⬇️")
     let [tireList, setTireList]=useState([]);
-
     let [tiresOnSize, setTireOnSize] = useState([])
     let [DolarexchangeRial, setDolarexchangeRial] = useState()
     let [productprice, setProductPrice] = useState()
     let [productrialprice, setProductRialPrice] = useState(productprice * DolarexchangeRial)
+    //let [tirelogo, setTireLogo] = useState("")
+    //const hankkokLogo = "https://logonoid.com/images/hankook-logo.png"
 
-    //let history = useNavigate();
-    const navigate = useNavigate();
-    
-    const options = {
-      headers: {'accept': 'application/json'},
-      //headers: {'content-type': 'text/html'},
-      headers: {'X-Requested-With': 'XMLHttpRequest'},
-      headers: {'X-Content-Type-Options': 'nosniff '},
-      headers: {'x-requested-with': 'XMLHttpRequest'},
-      headers: {'x-content-type-options': 'nosniff '},
-      headers: {'x-content-type-options': 'no-sniff '},
-
-    };
-
-  //const response = await Axios.request(config);
-
-  /*
-  const data = JSON.stringify({
-  ...
-  });
-  */
-
-  /*
-  const response = await axios.post('https://someendpoint', data, axiosConfig).then(r => {
-    console.log('r', r);
-  })
-       */ 
-
-  // رسمي من الموقع جربه
-/*
-const instance = axios.create({
-  baseURL: 'https://some-domain.com/api/',
-  timeout: 1000,
-  headers: {'X-Custom-Header': 'foobar'}
-});
-  */
-
-
+    const navigate = useNavigate()
 
     useEffect(()=>  {
-
-       //axios.get('/getire',
-       axios.get('https://nodejsclusters-155029-0.cloudclusters.net/api/getire')
-       .then((res)=>{
-        //setTireList(res.data.data)
-        res.json().then((data)=> {
-          console.log(data)
-          setTireList(data)
-        })}
-        ).catch((err) => console.log('err getire:',err));
-        //setTireList(res.data)
-
+      axios.get('http://api.imagemarketing.net/getire',
+    ).then((res)=>{
+      setTireList(res.data);
+    })
     },[])
     
+    const getData = () => {
+      axios.get('http://api.imagemarketing.net/getire',
+    ).then((data)=>{
+      setTireList(data.data)
+    })
+    }
+  
+    useEffect(()=> {
+      getData()
+   }, [])
+  
+      window.addEventListener("beforeunload", (event)=> {
+        getData()
+      })
+      window.addEventListener("load", (event) => {
+        getData()
+      })
   //}
         useEffect(()=>{
           //axios.get(`https://api.alhjaji.com/getFromTireSize/${tiresize}`).then((data)=>
-          axios.get(`https://nodejsclusters-155029-0.cloudclusters.net/api/getFromTireSize/${tiresize}`).then((res)=>
+          axios.get(`http://api.imagemarketing.net/getFromTireSize/${tiresize}`).then((res)=>
           {
-            setTireOnSize(res.data)
-            .then((data) => {
-              if (data.error) {
-                console.log(data.error)
-              } else {
-                setTireOnSize(data)
-
-              }
-             //setTireOnSize(data.data)
-
-            })
+            setTireOnSize(res.data);
         })
           },[tiresize])
 
         const yemeniRials = ()=> {
-          axios.get(`/getexchangeDolar`).then((data)=>{
-            //axios.get(`https://alhjaji.com/api/getexchangeDolar`, {
-             //axios.get(`https://api.alhjaji.com/api/getexchangeDolar`, {
-
-            //mode: 'cors',
-           // headers: { "Content-Type": "application/json","charset":"utf-8" },
-            //Content-Type: application/x-javascript;charset=utf-8
-
-           //}).then((data)=>{
-
+          axios.get(`http://api.imagemarketing.net/getexchangeDolar`).then((data)=>{
             setDolarexchangeRial(data.data[0].DolarexchangeRial);
             setProductRialPrice(productprice * DolarexchangeRial)
          })
@@ -121,50 +76,73 @@ let handleTireSizeChange = (e) => {
   setTireSize(e.target.value)
   //console.log('tire Change:', tire)
 }
-
-
     return (
-      <div className="MainPage">
+      <div>
 
-      <Container className='PostContainer'>         
+      <Container fluid="md">         
         <h4>
             <Badge bg="secondary"> اختر مقاس اطار سيارتك من القائمة وقارن المواصفات والأسعار
       </Badge>        
-        </h4>
-                     
+        </h4>        
         <Form.Select size="lg" onChange={handleTireSizeChange}>
         <option value="⬇️ Select a Tire Size ⬇️"> -- اختر مقاس الإطار -- </option>
-        <option value='195r14'>195r14</option>
-        <option value='195r15'>195r15</option>
-        <option value='185r15'>185r15</option>
-        <option value='185R15'>185R15</option>
-        <option value='185R14'>185R14</option>
-        <option value='165-65R15'>165/65R15</option>
-        <option value='215-65R16'>215/65R16</option>
-        <option value='205-70R15'>205/70R15</option>
+        <option value='155r12'>155R12</option>
+        <option value='155R13'>155R13</option>
+        <option value='165-65R13'>165/65R13</option>
+        <option value='175-60R13'>175/60R13</option>
+        <option value='175-65R13'>175/65R13</option>
+        <option value='175-70R13'>175/70R13</option>
+        <option value='165-80R13'>165/80R13</option>
+       
+        <option value='165-65R14'>165/65R14</option>
+        <option value='165-70R14'>165/70R14</option>
+        <option value='175-65R14'>175/65R14</option>
+        <option value='185-70R14'>185/70R14</option>
+
+        <option value='165-60R15'>165/60R15</option>
+        <option value='185-65R15'>185/65R15</option>
+        <option value='195-60R15'>195/60R15</option>
+        <option value='195-55R15'>195/55R15</option>
+        <option value='205-60R15'>205/60R15</option>
         <option value='205-65R15'>205/65R15</option>
+        <option value='215-65R15'>215/65R15</option>
+        
+        <option value='195-55R16'>195/55R16</option>
+        <option value='205-60R16'>205/60R16</option>
+        <option value='215-60R16'>215/60R16</option>
+
+        
+        <option value='225-45R17'>225/45R17</option>
+        <option value='235-45R17'>235/45R17</option>
+        <option value='245-40R17'>245/40R17</option>
+        <option value='245-45R17'>245/45R17</option>
+
+        
+        <option value='265-65R17'>265/65R17</option>
 
       </Form.Select>
-      <Container className='TireContainer'>
+      <Container>
+        <Row>
                {
                  tiresOnSize.map((val)=>{
-                  const url ='https://web.whatsapp.com/send?phone=967775955150&text='
-                 + ' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
-                return(
-                  <Container>
+                    
+                  //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
+                  const url ='https://wa.me/967772911888?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
+                  + 'والمسعر بقيمة:'+ val.price  + 'دولار'
+                  return(
+                  <Col sm={4} >
+                 
                     <Badge bg="warning" text="dark">
                     {val.brandname }
+                  
                      </Badge>
-                <Card style={{ width: '18rem' }} key={val.id }>
+                <Card  key={val.id } bg="primary" sm={4}>
                 <Card.Header>
-                  <Nav variant="pills" defaultActiveKey="#first">
+                <Nav variant="pills" defaultActiveKey="#first">
                     <Nav.Item>
-                      <Nav.Link href="" >Active</Nav.Link>
+                      <Nav.Link  href="#link" onClick={()=>(navigate(`/tire/${val.id}`))}>مواصفات</Nav.Link>
                     </Nav.Item>
-                    <Nav.Item>
-                      <Nav.Link href="#link">Link</Nav.Link>
-                    </Nav.Item>
-                
+                  
                     <Nav.Item>
                       <Nav.Link href="#disabled" disabled>
                         Disabled
@@ -172,36 +150,40 @@ let handleTireSizeChange = (e) => {
                     </Nav.Item>
                   </Nav>
              </Card.Header>
+
                   <Card.Img variant="top" src={val.image}  />
                   <Card.Body>
                     <Card.Title><Badge bg="warning" text="dark">
-                    {val.brandname }
+                اطارات    {val.brandname }
                      </Badge>
                      <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.id}`))}>{val.tiresize}</h1>       
                      </Card.Title>
                     <Card.Text>
-                    {val.tiresize}
+                   
                     <h3>
                      <Badge bg="secondary">{val.price} </Badge> دولار
                 </h3>
                     </Card.Text>
-                    <Button as="a" variant="primary" href={url} target='_blank'>شراء </Button>
                   </Card.Body>
-                  <ListGroup variant="flush">
+                  <ListGroup variant="flush" bg="danger">
+                 
+                  <ListGroup.Item>
                   <h4>
-                     <Badge bg="danger" as={Button} onClick={yemeniRials} >السعر باليمني</Badge >
+                     <Badge bg="danger" as={Button} onClick={yemeniRials} >اضغط هنا للسعر بالريال</Badge >
                      </h4>
-                  <ListGroup.Item>{DolarexchangeRial} سعر الصرف</ListGroup.Item>
-                  <ListGroup.Item> <h5>
-                ريال يمني<Badge bg="secondary">{productrialprice = (DolarexchangeRial * val.price)} </Badge> 
+                    {DolarexchangeRial} سعر الصرف
+                   <h5>
+                ريال <Badge bg="secondary">{productrialprice = (DolarexchangeRial * val.price)} </Badge> 
                 </h5></ListGroup.Item>
-                  <ListGroup.Item> <Button as="a" variant="primary" href={url} target='_blank'>
+                <div> </div> 
+                </ListGroup>
+                <div> </div> 
+                <Button as="a" variant="primary" size="lg" href={url} target='_blank'>
                        شراء
                     </Button>
-                    </ListGroup.Item>
-                </ListGroup>
                 <Table striped bordered hover variant="dark" responsive>
                     <thead>
+                   
                       <tr>
                         <th>اقصى حمولة</th>
                         <th> اقصى سرعة</th>
@@ -220,58 +202,53 @@ let handleTireSizeChange = (e) => {
                         <td>{val.Wetgripclass}</td>
                         <td>{val.noiseClass}</td>
                       </tr>
-                      <tr>
-                      <td>{val.Maxload}</td>
-                        <td>{val.MaxSpeed}</td>
-                        <td>{val.Depthoftread}</td>
-                        <td>{val.Rollingresistance}</td>
-                        <td>{val.Wetgripclass}</td>
-                        <td>{val.noiseClass}</td>
-                      </tr>
-                   
                     </tbody>
                   </Table>
                 </Card>
-
-                  </Container>            
+               </Col>            
       
                    )
                 })              
                }
+               </Row>
            </Container>            
-
-              <h4>
-                     <Badge bg="danger"  >اطارات اخرى</Badge >
-                     </h4>
-                     <h4>
-                     <Badge bg="danger"  > {error}</Badge >
-                     </h4>
-
-           <Container className='TireContainer'>
-
+               <div>
+               <h4>
+              <Badge bg="danger"  >اطارات اخرى</Badge >
+              </h4>
+               </div>
+           <Container>
+            <Row>
+                <h4>
+                   <Badge bg="danger"  > {error}</Badge >
+                   </h4>
            {//tireList.map((val)=>{
              // Array.isArray(tireList) ?
                  tireList.map((val)=>{
-                   const url ='https://web.whatsapp.com/send?phone=967775955150&text='
-                   + ' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
+                 //  const url ='https://web.whatsapp.com/send?phone=967775955150&text='
+                  // + ' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
+                   const url ='https://wa.me/967772911888?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
+                   + 'والمسعر بقيمة:'+ val.price  + 'دولار'
             return (
-             
-              <Card style={{ width: '18rem' }} key={val.id} >
+             <Col sm={4}>
+              <Card 
+              key={val.id} 
+              sm={4}
+                bg="primary"
+                text='white'
+              // border="warning" 
+              >
                 <Card.Header>
                   <Nav variant="pills" defaultActiveKey="#first">
                     <Nav.Item>
-                      <Nav.Link href="" >Active</Nav.Link>
+                      <Nav.Link  href="#link" onClick={()=>(navigate(`/tire/${val.id}`))}>مواصفات</Nav.Link>
                     </Nav.Item>
-                    <Nav.Item>
-                      <Nav.Link href="#link" onClick={()=>(navigate(`/tire/${val.id}`))}>مواصفات</Nav.Link>
-                    </Nav.Item>
-                 
                   </Nav>
              </Card.Header>
                   <Card.Img variant="top" src={val.image}  />
                   <Card.Body>
                     <Card.Title><Badge bg="warning" text="dark">
-                    {val.brandname }
+                    اطار {val.brandname } 
                      </Badge>
                      <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.id}`))}>{val.tiresize}</h1>       
                      </Card.Title>
@@ -286,7 +263,7 @@ let handleTireSizeChange = (e) => {
                   </Card.Body>
                   <ListGroup variant="flush">
                   <h4>
-                     <Badge bg="danger" as={Button} onClick={yemeniRials} >السعر باليمني</Badge >
+                     <Badge bg="danger" as={Button} onClick={yemeniRials} >السعر بالريال</Badge >
                      </h4>
                      <h4>
                      <Badge bg="danger" as={Button} > 0</Badge >Likes:
@@ -295,22 +272,45 @@ let handleTireSizeChange = (e) => {
                   <ListGroup.Item> <h5>
                 ريال يمني<Badge bg="secondary">{productrialprice = (DolarexchangeRial * val.price)} </Badge> 
                 </h5></ListGroup.Item>
-                  <ListGroup.Item> <Button as="a" variant="primary" href={url} target='_blank'>
+                  <Button as="a" variant="primary" size="lg" href={url} target='_blank'>
                        شراء
                     </Button>
-                    </ListGroup.Item>
                 </ListGroup>
+                  <Table striped bordered hover variant="dark" responsive>
+                    <thead>
+                   
+                      <tr>
+                        <th>اقصى حمولة</th>
+                        <th> اقصى سرعة</th>
+                        <th>عمق الدعسة</th>
+                        <th>تصنيف التدحرج</th>
+                        <th>تصنيف القبضة الرطبة</th>
+                        <th>تصنيف الضجيج </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{val.Maxload}</td>
+                        <td>{val.MaxSpeed}</td>
+                        <td>{val.Depthoftread}</td>
+                        <td>{val.Rollingresistance}</td>
+                        <td>{val.Wetgripclass}</td>
+                        <td>{val.noiseClass}</td>
+                      </tr>
+                    </tbody>
+                  </Table>
                 </Card>
-   
+              </Col>
               ) })
                // : null
 
               } 
+              </Row>
          </Container>            
 
 </Container>
 </div>
     )
-}
+  }
 
-export default HomePage
+export default HomePage;

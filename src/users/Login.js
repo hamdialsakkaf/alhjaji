@@ -6,21 +6,23 @@ import Button from 'react-bootstrap/Button';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Badge from 'react-bootstrap/Badge';
 import bcrypt from 'bcryptjs'
+
 //import { useHistory } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
 function Login() {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [msg, setMsg] = useState('');
     const [permissions, setPermissions] = useState('');
       // useState hook to inform the user about the loading state
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+
     const [auth, setAuth] = useState(false);
     
     const hashedPassword = bcrypt.hashSync(password, '$2a$10$CwTycUXWue0Thq9StjUM0u') // hash created previously created upon sign up
-    const history = useNavigate();
- 
+    //let history = useHistory();
+    const navigate = useNavigate();
     useEffect(()=>{
         if(localStorage.getItem("login")){
             const login = JSON.parse(localStorage.getItem("login"))
@@ -28,16 +30,13 @@ function Login() {
             setAuth(login);
             // return true;
         }
-
         if(auth) {
-            history("/AdminPage")
+           navigate('/AdminPage')
         }
     },[auth])
 
-    
     const submitAuth = async (e) => {
         e.preventDefault();
-       
         try {
            // Axios.get(`http://localhost:3002/login/${email}`).then((data)=>{
             setLoading(true);
@@ -46,32 +45,22 @@ function Login() {
                 passowrd: hashedPassword
             }
             //await axios.post('https://api.agtco.info/api/login', 
-            await axios.post('/login', 
-
+            await axios.post('http://api.imagemarketing.net/login', 
                 user
-                     
             ).then((data)=>{
                 setPermissions(data.data[0].Permissions)
                 console.log('permissions:', permissions)
-                //setUserInfo(data.data);
-               // setAuth(true);
-                //setUserEmail(data.data[0].email);
-                //setHashedPassowrdFromServer(data.data[0].password)
-                //console.log('password:from login page',useremail)
-                //console.log('hashedPassowrdFromServer:',hashedPassowrdFromServer)
-               if(hashedPassword == data.data[0].password) {
-                if(permissions == "admin") {
+               if(hashedPassword === data.data[0].password) {
+                if(permissions === "admin") {
                         localStorage.setItem("login", 'true');
                         setAuth(true);
-                        // return JSON.parse(localStorage.getItem("login"));
-                         history("/AdminPage")
-         
-                        // history("/HomePage")
+                         navigate("/AdminPage", { replace: true });
+
                         } else {
                             setMsg('لا تملك صلاحيات، يرجى طلب صلاحيات من الادارة')
                             setAuth(false);
                         }
-                    } else {
+                    } else {    
                         setAuth(false);
                          // Used local storage to sustain the login state
                         if(!localStorage.getItem("login")){
@@ -81,46 +70,14 @@ function Login() {
                     }
                         setMsg('بيانات ادخال غير صحيحة')
                     }
-                /*
-                //setAuth(true);
-                 // Used local storage to sustain the login state
-                if(!localStorage.getItem("login")){
-                    localStorage.setItem("login", 'true');
-                    return true;
-                }
-                */
-                /*
-                localStorage.setItem("login", 'true');
-               // return JSON.parse(localStorage.getItem("login"));
-                history("/AdminPage")
-
-               // history("/HomePage")
-               } else {
-                console.log('errlogin:')
-                setAuth(false);
-               // history("/HomePage")
-                setMsg('بيانات ادخال غير صحيحة')
-               }
-               */
-               /*
-                bcrypt.compare(String(hashedPassword),String(hashedPassowrdFromServer)).then((rese)=>{
-                    console.log('match:', rese)
-                    if(rese){
-                        history("/HomePage")
-                    }
-                    console.log('errlogin:')
-    
-                 })
-                 */
-                //history.push("/HomePage");
-               // history("/HomePage")
+              
              })
            
         } catch (error) {
-            history("/Login")
-
+            //navigate("/Login")
+            //history.push("/Login")
+            navigate('/Login', { replace: true })
                 setMsg(error.data.data);
-            
         }
     }
 

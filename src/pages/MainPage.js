@@ -11,7 +11,7 @@ function MainPage() {
 
     useEffect(()=> {
         //Axios.get("http://localhost:3002/server/api/get").then((data)=> {
-        Axios.get("https://alhjaji.com/server/api/get",{
+        Axios.get("http://api.imagemarketing.net/get",{
             mode: 'cors',
             headers: {
              "Content-Type": "text/html",
@@ -25,7 +25,7 @@ function MainPage() {
 
     const LikePost = (id) => {
         //Axios.post(`http://localhost:3002/server/api/like/${id}`).then((response)=> {
-        Axios.post(`https://alhjaji.com/server/api/like/${id}`,{
+        Axios.post(`http://api.imagemarketing.net/like/${id}`,{
             mode: 'cors',
             headers: {
              "Content-Type": "text/html",

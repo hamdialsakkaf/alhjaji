@@ -9,11 +9,11 @@ const database = process.env.DATABASE
 
 
 const db = mysql.createConnection({
-host: "localhost",
-user: "alhj03531074_root",
-password:"alhj03531074_root",
-port : 3306,
-database:"alhj03531074_blog_posts"
+host: "mysql-155030-0.cloudclusters.net",
+user: "admin",
+password:"vopkXWSQ",
+port : 10010,
+database:"alhjaji"
 })
 
 module.exports = db;

@@ -1,0 +1,3 @@
+database: imag50144706_tires
+user:imag50144706_alhjaji
+pass:alhj03531074_root

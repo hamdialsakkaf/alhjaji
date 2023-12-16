@@ -3,6 +3,7 @@ import axios from 'axios';
 //import  Axios  from '../config'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import bcrypt from 'bcryptjs'
 
@@ -21,39 +22,29 @@ function Register() {
  
     const submitUser = async (e) => {
         e.preventDefault();
-        // SALT should be created ONE TIME upon sign up
-        //const salt = bcrypt.genSaltSync(10)
-        // example =>  $2a$10$CwTycUXWue0Thq9StjUM0u => to be added always to the password hash
-
-        try {
             const user = {
                 name: name,
                 email: email,
                 password: hashedPassword,
             }
-            await axios.post('https://alhjaji.com:3306/api/users', 
+            await axios.post('http://api.imagemarketing.net/users', 
             user,
-       
             ).then((res)=> {
-                console.log('succes register', res.data)
-                alert('تم التسجيل بنجاح')
-            }) .catch((error) => {
-                alert('حصلت مشكلة في الادخال')
-                //res.send(null)
-              });
-            
-            history.push("/");
-        } catch (error) {
-            if (error.response) {
-                setMsg(error.response.data.msg);
+                setMsg('تم تسجيل المستخدم بنجاح');
+               // alert('تم التسجيل بنجاح')
+            }).catch((err) =>{
+                setMsg('خطأ في تسجيل المستخدم')
             }
-        }
+            )
+            //history.push("/");
+        
     }
-  
-
     return (
         <div className="MainPage">
         <div className='PostContainer'>
+        <h4>
+                  <Badge bg="secondary">{msg}</Badge>
+              </h4>
         <Form>
                                     <Form.Group className="mb-3" controlId="formGridAddress1">
                                         <FloatingLabel

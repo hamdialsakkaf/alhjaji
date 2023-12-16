@@ -81,11 +81,9 @@ button{
 }
 
 .PostContainer{
-  height: calc(100vh -80px);
   width: 100%;
   max-width: 100%;
   padding:30px;
-  display: flex;
   justify-content: center;
   flex-direction: column;
   background-color: #ffffff;
@@ -118,7 +116,6 @@ button{
 .TireContainer{
   flex: 1;
   flex-direction: row;
-  height: calc(100vh -80px);
   width: 100%;
   max-width: 100%;
   padding:30px;
@@ -193,6 +190,6 @@ button{
   height:80px;
   background-color: #1C1E4B;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
+  align-items: baseline;
 }
