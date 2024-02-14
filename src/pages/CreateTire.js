@@ -56,7 +56,7 @@ const submitTire = async (e) => {
         noiseClass: noiseClass,
         price: price
     }
-    await axios.post('http://api.imagemarketing.net/createtire',
+    await axios.post('https://api.imagemarketing.net/createtire',
         tire 
      )
      .then((res)=> {

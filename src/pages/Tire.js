@@ -14,8 +14,12 @@ import { Badge } from 'react-bootstrap';
 export default function Tire() {
 let {tireId} = useParams();
 const [tire,setTire] = useState({})
-useEffect(()=>{
-  axios.get(`http://api.imagemarketing.net/getFromTireId/${tireId}`).then((data)=>{
+window.addEventListener("load", (event) => {
+ return getFromTireId()
+})
+
+const getFromTireId = ((tireId)=>{
+  axios.get(`https://api.imagemarketing.net/getFromTireId/${tireId}`).then((data)=>{
     console.log(data)
     setTire({
         id:data.data[0].id,
@@ -33,7 +37,32 @@ useEffect(()=>{
 
         });
  });
-},[tireId]);
+})
+useEffect(()=> {
+  getFromTireId()
+},[tireId])
+/*
+useEffect(()=>{
+  axios.get(`https://api.imagemarketing.net/getFromTireId/${tireId}`).then((data)=>{
+    console.log(data)
+    setTire({
+        id:data.data[0].id,
+        tiresize: data.data[0].TireSize,
+         brandname: data.data[0].brandname,
+         imageUrl: data.data[0].image,
+         Maxload: data.data[0].Maxload,
+         MaxSpeed: data.data[0].MaxSpeed,
+         Depthoftread: data.data[0].Depthoftread,
+         Rollingresistance: data.data[0].Rollingresistance,
+         Wetgripclass: data.data[0].Wetgripclass,
+         noiseClass: data.data[0].noiseClass,
+         price: data.data[0].price,
+         image: data.data[0].image,
+
+        });
+ });
+},[]);
+*/
 const deletePost = (id) => {
   axios.delete(`http://api.imagemarketing.net/deleteTire/${tireId}`).then((response)=>{
         alert("you deleted a tire")

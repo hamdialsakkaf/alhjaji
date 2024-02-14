@@ -27,7 +27,7 @@ function Register() {
                 email: email,
                 password: hashedPassword,
             }
-            await axios.post('http://api.imagemarketing.net/users', 
+            await axios.post('https://api.imagemarketing.net/users', 
             user,
             ).then((res)=> {
                 setMsg('تم تسجيل المستخدم بنجاح');

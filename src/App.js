@@ -9,7 +9,8 @@ import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Badge from 'react-bootstrap/Badge';
+import Form from 'react-bootstrap/Form';
+import Stack from 'react-bootstrap/Stack';
 import './App.css';
 import HomePage from './pages/HomePage';
 import Register from './users/Register';
@@ -23,14 +24,18 @@ import Tire from './pages/Tire';
 const App =() => {
 
   return (
-    <Container container-fluid data-bs-theme="dark" dir="rtl">
+    <Container container-fluid data-bs-theme="dark" dir="rtl" fluid="md" className='container'>
+          <Row >
+        <Col >
+        <Stack   gap={1} className="container col-md-12 mx-auto">
+        <img src='/LOGO-300.jpg' alt='الحجاجي للتجارة'  height='200%' />
+        </Stack>
+        </Col>
+          </Row>
         <Row>
-        <h4 className='App'>
-        <Badge pill bg="primary"> فيجن للتجارة والتسويق</Badge>
-
-        </h4>
-        <div className="navbar">
-          <img src='/hajajy.png' alt='alhajaji' width={80} height='100%'/>
+        <Col>
+        <div className="navbar" >
+      
           <Nav fill variant="tabs" defaultActiveKey="/HomePage">
             <Nav.Item>
               <Nav.Link href="/HomePage">الرئيسية</Nav.Link>
@@ -48,7 +53,14 @@ const App =() => {
             </Nav.Item>
           </Nav>
     </div>
-    <div>
+  </Col>
+  <Row >
+    <Col>
+      <Stack   gap={1} className="container col-md-7 mx-auto">
+   
+    </Stack>
+  </Col>
+    </Row>
     <BrowserRouter>
     <Routes
       // if you're not server rendering, this manages the
@@ -83,13 +95,12 @@ const App =() => {
       </Route>
     </Routes>
   </BrowserRouter>
- </div>
  </Row>
 
 <Row>
 <Col>
 <div className="footer">
-          <img src='/hajajy.png' alt='alhjaji' width={80}/>
+          <img src='/LOGO-300.png' alt='bajaber' width={80}/>
           <Nav fill variant="tabs" defaultActiveKey="/HomePage">
             <Nav.Item>
               <Nav.Link href="/HomePage">الرئيسية</Nav.Link>

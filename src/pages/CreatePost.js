@@ -10,7 +10,7 @@ function CreatePost() {
 
 const submitPost = () => {
     // for shared server api
-    Axios.post('http://api.imagemarketing.net/create',{ mode: 'cors' }, {userName:userName, title: title, text: text})
+    Axios.post('https://api.imagemarketing.net/create',{ mode: 'cors' }, {userName:userName, title: title, text: text})
     //Axios.post('http://localhost:3002/api/create', {userName:userName, title: title, text: text})
 
 }
