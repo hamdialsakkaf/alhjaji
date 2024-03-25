@@ -2,11 +2,17 @@ import React, { useState, useEffect} from "react";
 import { useNavigate } from 'react-router-dom';
 import useLocalStorage from "use-local-storage";
 import Container from 'react-bootstrap/Container';
+import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Stack } from "react-bootstrap";
-import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
+import Button from 'react-bootstrap/Button';
+import Table from 'react-bootstrap/Table';
+import Form from 'react-bootstrap/Form';
+import Card from 'react-bootstrap/Card';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Nav from 'react-bootstrap/Nav';
 
 const AdminPage = () => {
   //let history = useHistory();
@@ -22,9 +28,24 @@ const AdminPage = () => {
      await getData()
   }, [])
 
+
+
  // const [username, setUsername] = useLocalStorage("name", "");
  let [buyerRequests, setBuyerRequests] = useState([])
+ let [stateRequest, setStateRequest] = useState([])
 
+
+
+/*
+  useEffect(() => {
+    if (stateRequest == 'Inprogress') {
+      <div>
+      <ToastContainer  transition={Slide} autoClose={2000} />
+    </div>
+      
+    }
+  }, [stateRequest])
+  */
   const [login, setLogin] = useLocalStorage("login", "false");
   console.log('login getLogin:', login)
   /*
@@ -66,6 +87,7 @@ const AdminPage = () => {
  
 	return(
     <Container>
+      
             {
         login ? (
              //children 
@@ -92,15 +114,16 @@ const AdminPage = () => {
     <h1></h1>
     </div>
     </Stack>
-
+  
       <Container>
         <Row>
                {
                  buyerRequests.map((val)=>{
-                    
+                 // setBuyerShopName(val.buyerShopName)  
+                  setStateRequest(val.stateRequest)
                   //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
-                  const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.buyer_id+ ' المقاس:'+ val.buyer_id 
-                  + 'والمسعر بقيمة:'+ val.price  + 'دولار'
+                  const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.buyer_id+ ' المقاس:'+ val.q 
+                  + 'والمسعر بقيمة:'+ val.product  + 'دولار'
                   return(
                   <Col sm={4} xs="auto">
                  
@@ -122,18 +145,17 @@ const AdminPage = () => {
                     </Nav.Item>
                   </Nav>
              </Card.Header>
-
-                  <Card.Img variant="top" src={val.itemNo}  />
                   <Card.Body>
                     <Card.Title><Badge bg="warning" text="dark">
-                اطارات    {val.itemNo }
+                طلب شراء   
                      </Badge>
-                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.itemNo}`))}>{val.itemNo}</h1>       
+                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.buyer_id}`))}>{val.buyer_id} | {val.buyerShopName}</h1>   
+                      
                      </Card.Title>
                     <Card.Text>
-                   
+                  
                     <h3>
-                     <Badge bg="secondary">{val.itemNo} </Badge> دولار
+                     <Badge bg="secondary">{val.product} </Badge> 
                 </h3>
                     </Card.Text>
                   </Card.Body>
@@ -141,10 +163,8 @@ const AdminPage = () => {
                  
                   <ListGroup.Item>
                   <div className="vr" />
-                  <Button variant="outline-danger" onClick={yemeniRials}>اضغط هنا للسعر بالريال</Button>
-                    {DolarexchangeRial} سعر الصرف
                    <h5>
-                ريال <Badge bg="secondary">{productrialprice = (DolarexchangeRial * val.price)} </Badge> 
+             
                 </h5></ListGroup.Item>
                 <div> </div> 
                 </ListGroup>
@@ -152,26 +172,30 @@ const AdminPage = () => {
                 <Button as="a" variant="danger" size="lg" href={url} target='_blank'>
                        شراء
                     </Button>
+                    <Badge bg="secondary">{val.product} </Badge> 
+              
                 <Table striped bordered hover variant="dark" responsive>
                     <thead>
                    
                       <tr>
-                        <th>اقصى حمولة</th>
-                        <th> اقصى سرعة</th>
-                        <th>عمق الدعسة</th>
-                        <th>تصنيف التدحرج</th>
-                        <th>تصنيف القبضة الرطبة</th>
-                        <th>تصنيف الضجيج </th>
+                        <th> العميل </th>
+                        <th>رقم الصنف</th>
+                        <th> الكمية</th>
+                        <th> حالةالطلب</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
+                        <td>{val.buyer_id}</td>
                         <td>{val.itemNo}</td>
-                        <td>{val.itemNo}</td>
-                        <td>{val.itemNo}</td>
-                        <td>{val.product}</td>
                         <td>{val.quantity}</td>
-                        <td>{val.quantity}</td>
+                        <td>قيد التحقق</td>
+                        <td><Button  variant="danger" size="sm" >
+                       قيد التنفيذ
+                    </Button>
+                 
+                      </td>
                       </tr>
                     </tbody>
                   </Table>
@@ -182,9 +206,8 @@ const AdminPage = () => {
                 })              
                }
                </Row>
+             
            </Container>            
-            
-               
 
 </Container>
 
@@ -198,7 +221,6 @@ const AdminPage = () => {
          //history.push("/Login")
          //navigate('/Login', { replace: true })
         }
-           
        </Container> 
         )
   }
