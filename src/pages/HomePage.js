@@ -40,7 +40,7 @@ import '../App.css';
     },[])
     */
     const getData = async() => {
-     await axios.get('https://api.imagemarketing.net/getire',
+     await axios.get('http://api.imagemarketing.net/getire',
     ).then((data)=>{
       setTireList(data.data)
     })
@@ -60,14 +60,14 @@ import '../App.css';
   //}
         useEffect(()=>{
           //axios.get(`https://api.alhjaji.com/getFromTireSize/${tiresize}`).then((data)=>
-          axios.get(`https://api.imagemarketing.net/getFromTireSize/${tiresize}`).then((res)=>
+          axios.get(`http://api.imagemarketing.net/getFromTireSize/${tiresize}`).then((res)=>
           {
             setTireOnSize(res.data);
         })
           },[tiresize])
 
         const yemeniRials = ()=> {
-          axios.get(`https://api.imagemarketing.net/getexchangeDolar`).then((data)=>{
+          axios.get(`http://api.imagemarketing.net/getexchangeDolar`).then((data)=>{
             setDolarexchangeRial(data.data[0].DolarexchangeRial);
             setProductRialPrice(productprice * DolarexchangeRial)
          })
@@ -139,7 +139,7 @@ let handleTireSizeChange = (e) => {
                  tiresOnSize.map((val)=>{
                     
                   //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
-                  const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
+                  const url ='http://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
                   + 'والمسعر بقيمة:'+ val.price  + 'دولار'
                   return(
                   <Col sm={4} xs="auto">

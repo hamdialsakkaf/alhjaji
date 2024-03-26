@@ -14,8 +14,18 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Nav from 'react-bootstrap/Nav';
 
+// Importing toastify module
+import { toast,ToastContainer } from "react-toastify";
+ 
+// Import toastify css file
+import "react-toastify/dist/ReactToastify.css";
+
+
+
 const AdminPage = () => {
   //let history = useHistory();
+  const notify = () => toast("Wow so easy!");
+
   const navigate = useNavigate();
   const getData = async() => {
     await axios.get('http://api.imagemarketing.net/getBuyerRequest',
@@ -33,6 +43,7 @@ const AdminPage = () => {
  // const [username, setUsername] = useLocalStorage("name", "");
  let [buyerRequests, setBuyerRequests] = useState([])
  let [stateRequest, setStateRequest] = useState([])
+
 
 
 
@@ -87,7 +98,7 @@ const AdminPage = () => {
  
 	return(
     <Container>
-      
+        <ToastContainer />
             {
         login ? (
              //children 
@@ -120,7 +131,7 @@ const AdminPage = () => {
                {
                  buyerRequests.map((val)=>{
                  // setBuyerShopName(val.buyerShopName)  
-                  setStateRequest(val.stateRequest)
+                 // setStateRequest(val.stateRequest)
                   //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
                   const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.buyer_id+ ' المقاس:'+ val.q 
                   + 'والمسعر بقيمة:'+ val.product  + 'دولار'
@@ -149,7 +160,7 @@ const AdminPage = () => {
                     <Card.Title><Badge bg="warning" text="dark">
                 طلب شراء   
                      </Badge>
-                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.buyer_id}`))}>{val.buyer_id} | {val.buyerShopName}</h1>   
+                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.buyer_id}`))}>{val.buyer_id}  {val.buyerShopName}</h1>   
                       
                      </Card.Title>
                     <Card.Text>
@@ -194,7 +205,8 @@ const AdminPage = () => {
                         <td><Button  variant="danger" size="sm" >
                        قيد التنفيذ
                     </Button>
-                 
+                    <Button onClick={notify}>Notify!</Button>
+
                       </td>
                       </tr>
                     </tbody>
