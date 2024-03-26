@@ -1,4 +1,6 @@
 import React, { useState, useEffect} from "react";
+import { useDispatch, useSelector } from 'react-redux'
+
 import { useNavigate } from 'react-router-dom';
 import useLocalStorage from "use-local-storage";
 import Container from 'react-bootstrap/Container';
@@ -20,28 +22,55 @@ import { toast,ToastContainer } from "react-toastify";
 // Import toastify css file
 import "react-toastify/dist/ReactToastify.css";
 
-
+//import { getGtItems } from "../redux/slices/gtSlice";
+import { getBuyerRequests } from "../redux/slices/getBuyerRequestSlice";
 
 const AdminPage = () => {
+  const dispatch = useDispatch()
+
   //let history = useHistory();
   const notify = () => toast("Wow so easy!");
 
   const navigate = useNavigate();
+  /*
   const getData = async() => {
     await axios.get('http://api.imagemarketing.net/getBuyerRequest',
    ).then((data)=>{
     setBuyerRequests(data.data)
    })
    }
- 
+ */
+
+/*
    useEffect(async()=> {
      await getData()
   }, [])
+*/
+     // Get the gtTires from the store
+     const getbuyerRequestsState = useSelector((state) => state.buyerRequests)
+     const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
 
+  
+  console.log('buyerRequests:', buyerRequests)
+     useEffect(() => {
+      // eslint-disable-next-line no-unused-vars
+      let isMounted = true
+  
+      // If status is 'idle', then fetch the posts data from the API
+      if (statusBR === 'idle') {
+        dispatch(getBuyerRequests())
+      }
+  
+      // Cleanup function
+      return () => {
+        isMounted = false
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [statusBR, dispatch])
 
 
  // const [username, setUsername] = useLocalStorage("name", "");
- let [buyerRequests, setBuyerRequests] = useState([])
+ //let [buyerRequests, setBuyerRequests] = useState([])
  let [stateRequest, setStateRequest] = useState([])
 
 
