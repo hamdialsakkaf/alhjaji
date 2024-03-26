@@ -23,13 +23,13 @@ import { toast,ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 //import { getGtItems } from "../redux/slices/gtSlice";
-import { getBuyerRequests } from "../redux/slices/getBuyerRequestSlice";
+import { getBuyerRequests, setInprogressRequset } from "../redux/slices/getBuyerRequestSlice";
 
 const AdminPage = () => {
   const dispatch = useDispatch()
 
   //let history = useHistory();
-  const notify = () => toast("Wow so easy!");
+
 
   const navigate = useNavigate();
   /*
@@ -51,7 +51,57 @@ const AdminPage = () => {
      const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
 
   
-  console.log('buyerRequests:', buyerRequests)
+  //console.log('buyerRequests:', buyerRequests)
+  //console.log(' buyerRequests.stateRequest:',  buyerRequests.stateRequest)
+  const [ buyerShopName,setBuyerShopName  ] = useState('')
+  const [ requestid,setRequestid  ] = useState('')
+  let [stateRequest, setStateRequest] = useState('')
+
+  const reqDetaile = {
+    requestid: requestid,
+    buyerShopName:buyerShopName
+  }
+  const Msg = ({reqDetaile}) => (
+   
+    <Container>
+      
+    <Row>
+      يوجد طلب جديد من:  {buyerShopName}
+      <Button>Retry</Button>
+      <Button  >InProgress</Button>
+    </Row>
+    </Container>
+  );
+/*
+    useEffect(() => {
+      const notify = () => toast(<Msg />, {autoClose: false});
+
+      dispatch(notify)
+
+    }, [stateRequest ='newRequest'])
+*/
+  const dispathNontification = (() => {
+    buyerRequests.map((val)=>{
+      const buyerShopName = val.buyerShopName;
+      const Requestid = val.request_id;
+      const stateRequest = val.stateRequest
+      console.log('Requestid admin', Requestid)
+      console.log('Requestid stateRequest', stateRequest)
+
+      console.log('admin buyerShopName', buyerShopName)
+      if (stateRequest == 'newRequest') {
+        setStateRequest(stateRequest)
+        setBuyerShopName(buyerShopName)
+        setRequestid(Requestid)
+
+      }
+    })
+  })
+/*
+  setTimeout(() => {
+    dispathNontification()
+  }, 5000);
+  */
      useEffect(() => {
       // eslint-disable-next-line no-unused-vars
       let isMounted = true
@@ -60,7 +110,6 @@ const AdminPage = () => {
       if (statusBR === 'idle') {
         dispatch(getBuyerRequests())
       }
-  
       // Cleanup function
       return () => {
         isMounted = false
@@ -70,11 +119,11 @@ const AdminPage = () => {
 
 
  // const [username, setUsername] = useLocalStorage("name", "");
- //let [buyerRequests, setBuyerRequests] = useState([])
- let [stateRequest, setStateRequest] = useState([])
-
-
-
+/*
+ if (stateRequest == 'Inprogress') {
+  dispatch(notify)
+}
+*/
 
 /*
   useEffect(() => {
@@ -160,7 +209,8 @@ const AdminPage = () => {
                {
                  buyerRequests.map((val)=>{
                  // setBuyerShopName(val.buyerShopName)  
-                 // setStateRequest(val.stateRequest)
+                  //setStateRequest(val.stateRequest)
+                
                   //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
                   const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.buyer_id+ ' المقاس:'+ val.q 
                   + 'والمسعر بقيمة:'+ val.product  + 'دولار'
@@ -234,7 +284,6 @@ const AdminPage = () => {
                         <td><Button  variant="danger" size="sm" >
                        قيد التنفيذ
                     </Button>
-                    <Button onClick={notify}>Notify!</Button>
 
                       </td>
                       </tr>

@@ -1,23 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { useDispatch, useSelector } from 'react-redux'
 
 import axios from 'axios'
+import { updateInprogressReq } from '../../apis/apis'
 
 //const url = 'https://jsonplaceholder.typicode.com/posts'
 const url = 'http://api.imagemarketing.net/getBuyerRequest'
 
+const urlInprogress = 'http://api.imagemarketing.net/Inprogress'
 
 const initialState = {
     //GtItems: [],
     buyerRequests: [],
     statusBR: 'idle',
     errorGt: null,
-    filterOn: false
+    filterOn: false,
+    statusRequest: '',
+    errorRequest: ''
   }
 
   // Get all the posts from the API
 //export const getGtItems = createAsyncThunk('posts/getGtItems', async (thunkAPI) => {
   export const getBuyerRequests = createAsyncThunk('buyerRequests/getBuyerRequests', async (thunkAPI) => {
-
     try {
       const res = await axios.get(url)
       console.log('buyerRequests:', res.data)
@@ -27,7 +31,33 @@ const initialState = {
       return thunkAPI.rejectWithValue({ error: err.message })
     }
   })
-  
+
+  // تحديث حالة الطلب قيد التنفيذ
+    export const setInprogressRequset = createAsyncThunk('buyerRequests/setInprogressRequset',
+       async (data,thunkAPI) => {
+      try {
+        console.log('Inprogress requestid:',data)
+        updateInprogressReq(data)
+
+        return data
+
+/*
+       await axios.post(urlInprogress, {
+        requestid:requestid,
+          //stateRequest: 'Inprogress',
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+*/
+      } catch (err) {
+         console.error(err.message)
+        //return thunkAPI.rejectWithValue({ error: err.message })
+      }
+    })
   export const filterGtFunction = createAsyncThunk(
     "basket/filterGtFunction",
     async (data, thunkAPI) => {
@@ -64,7 +94,7 @@ const initialState = {
                 // Concat the new data to the existing data in the array
                 state.buyerRequests = state.buyerRequests.concat(action.payload)
                 //state.GtItems = state.GtItems.push(action.payload)
-
+               // dispatch(notify )
           })
           .addCase(getBuyerRequests.rejected, (state, action) => {
            // When data is fetched unsuccessfully
@@ -75,7 +105,25 @@ const initialState = {
         
                 console.error('errorGt',state.errorGt)
           })
-         
+          .addCase(setInprogressRequset.fulfilled, (state, action) => {
+            // action is inferred correctly here if using TS
+             // When data is fetched successfully
+                state.statusRequest = 'InProgress'
+        
+                // Concat the new data to the existing data in the array
+               // state.buyerRequests = state.buyerRequests.concat(action.payload)
+                //state.GtItems = state.GtItems.push(action.payload)
+               // dispatch(notify )
+          })
+          .addCase(setInprogressRequset.rejected, (state, action) => {
+           // When data is fetched unsuccessfully
+                state.statusRequest = 'failed'
+        
+                // Update the error message for proper error handling
+                //state.errorRequest = action.error.message
+        
+                console.error('errorRequest',state.errorRequest)
+          })
           // and provide a default case if no other handlers matched
           .addDefaultCase((state, action) => {})
       },
