@@ -16,7 +16,8 @@ const initialState = {
     errorGt: null,
     filterOn: false,
     statusRequest: '',
-    errorRequest: ''
+    errorRequest: '',
+    //notificationPop: false
   }
 
   // Get all the posts from the API

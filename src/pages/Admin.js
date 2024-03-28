@@ -33,6 +33,13 @@ const AdminPage = () => {
 
   const navigate = useNavigate();
   /*
+  axios.post("/newRequest",(req, res) => {
+   
+    console.log('new request added')
+ })
+ */
+ 
+  /*
   const getData = async() => {
     await axios.get('http://api.imagemarketing.net/getBuyerRequest',
    ).then((data)=>{
