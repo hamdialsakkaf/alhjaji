@@ -64,6 +64,20 @@ const AdminPage = () => {
   const [ requestid,setRequestid  ] = useState('')
   let [stateRequest, setStateRequest] = useState('')
 
+  useEffect(() => {
+    // opening a connection to the server to begin receiving events from it
+    const eventSource = new EventSource("https://api.imagemarketing.net/addrequest");
+    
+    // attaching a handler to receive message events
+    eventSource.onmessage = (event) => {
+      const stockData = JSON.parse(event.data);
+      console.log('new Request from server')
+    };
+    
+    // terminating the connection on component unmount
+    return () => eventSource.close();
+  }, []);
+
   const reqDetaile = {
     requestid: requestid,
     buyerShopName:buyerShopName
