@@ -21,6 +21,9 @@ import CreatePost from './pages/CreatePost';
 import Post from './pages/Post'
 import CreateTire from './pages/CreateTire';
 import Tire from './pages/Tire';
+import socketIO from 'socket.io-client';
+const socket = socketIO.connect('https://api.imagemarketing.net:4000');
+
 const App =() => {
 
   return (
