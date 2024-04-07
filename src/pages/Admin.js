@@ -15,6 +15,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Nav from 'react-bootstrap/Nav';
+import {io} from 'socket.io-client'
 
 // Importing toastify module
 import { toast,ToastContainer } from "react-toastify";
@@ -30,8 +31,31 @@ const AdminPage = () => {
 
   //let history = useHistory();
 
-
   const navigate = useNavigate();
+
+  const [newBuerRequest, setNewBuerRequest] = useState('fetching')  
+  useEffect(()=>{
+    try {
+      console.log('starting socket in client..')
+      const socket = io('https://api.imagemarketing.net', {
+        //withCredentials: true,
+        extraHeaders: {
+          "Access-Control-Allow-Origin": "*"
+        }
+      })
+      socket.on('connect', ()=>console.log(socket.id))
+      socket.on('connect_error', ()=>{
+        setTimeout(()=>socket.connect(),5000)
+      })
+      socket.on('newBuerRequest', (data)=>setNewBuerRequest(data))
+      console.log('newBuerRequest:', newBuerRequest)
+    } catch (error) {
+      console.log('Socket error Client:',error)
+    }
+  
+
+},[])
+
   /*
   axios.post("/newRequest",(req, res) => {
    
@@ -227,6 +251,13 @@ const AdminPage = () => {
   
       <Container>
         <Row>
+              <Form.Text muted className="text-center">
+                <h4>
+                    طلب جديد من:  
+                </h4>
+                <h4>{newBuerRequest}
+                </h4>
+                </Form.Text>
                {
                  buyerRequests.map((val)=>{
                  // setBuyerShopName(val.buyerShopName)  

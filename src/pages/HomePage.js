@@ -14,8 +14,33 @@ import Nav from 'react-bootstrap/Nav';
 import Stack from 'react-bootstrap/Stack';
 import { FloatingLabel } from 'react-bootstrap';
 import '../App.css';
+
+import {io} from 'socket.io-client'
+
 //Axios.defaults.baseurl = process.env.react_app_be_url;
   const HomePage = () => {
+    const [time, setTime] = useState('fetching')  
+    useEffect(()=>{
+      try {
+        console.log('starting socket in client..')
+        const socket = io('https://api.imagemarketing.net', {
+          //withCredentials: true,
+          extraHeaders: {
+            "Access-Control-Allow-Origin": "*"
+          }
+        })
+        socket.on('connect', ()=>console.log(socket.id))
+        socket.on('connect_error', ()=>{
+          setTimeout(()=>socket.connect(),5000)
+        })
+      socket.on('time', (data)=>setTime(data))
+      socket.on('disconnect',()=>setTime('server disconnected'))
+      } catch (error) {
+        console.log('Socket error Client:',error)
+      }
+    
+  
+  },[])
 
 //function HomePage() {
   //const [error, setError] = useState(null);
@@ -89,6 +114,7 @@ let handleTireSizeChange = (e) => {
       <h4>اختر مقاس اطار سيارتك من القائمة ادناه لتحصل على تفاصيل أكثر 
       </h4>
       </Form.Text>
+      {time}
       <div>
     <h1></h1>
     </div>

@@ -21,16 +21,15 @@ import CreatePost from './pages/CreatePost';
 import Post from './pages/Post'
 import CreateTire from './pages/CreateTire';
 import Tire from './pages/Tire';
-import socketIO from 'socket.io-client';
-const socket = socketIO.connect('https://api.imagemarketing.net:4000');
+
 
 const App =() => {
-
+     
   return (
     <Container container-fluid data-bs-theme="dark" dir="rtl" fluid="md" className='container'>
           <Row >
         <Col >
-        <Stack   gap={1} className="container col-md-12 mx-auto">
+        <Stack gap={1} className="container col-md-12 mx-auto">
         <img src='/LOGO-300.jpg' alt='الحجاجي للتجارة'  height='200%' />
         </Stack>
         </Col>
