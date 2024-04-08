@@ -1,5 +1,7 @@
 import React,{useState,useEffect } from 'react'
 import axios from 'axios';
+import { useDispatch } from 'react-redux'
+
 import {useNavigate} from 'react-router-dom'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -14,11 +16,16 @@ import Nav from 'react-bootstrap/Nav';
 import Stack from 'react-bootstrap/Stack';
 import { FloatingLabel } from 'react-bootstrap';
 import '../App.css';
-
+// Importing toastify module
+ 
+// Import toastify css file
 import {io} from 'socket.io-client'
 
 //Axios.defaults.baseurl = process.env.react_app_be_url;
   const HomePage = () => {
+    const dispatch = useDispatch()
+
+ 
     const [time, setTime] = useState('fetching')  
     useEffect(()=>{
       try {
@@ -33,6 +40,9 @@ import {io} from 'socket.io-client'
         socket.on('connect_error', ()=>{
           setTimeout(()=>socket.connect(),5000)
         })
+        
+        socket.on('newBuerRequest', (data)=>setTime(data))
+
       socket.on('time', (data)=>setTime(data))
       socket.on('disconnect',()=>setTime('server disconnected'))
       } catch (error) {

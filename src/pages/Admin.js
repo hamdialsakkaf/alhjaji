@@ -18,7 +18,7 @@ import Nav from 'react-bootstrap/Nav';
 import {io} from 'socket.io-client'
 
 // Importing toastify module
-import { toast,ToastContainer } from "react-toastify";
+import { Bounce,Slide,toast,ToastContainer,cssTransition } from "react-toastify";
  
 // Import toastify css file
 import "react-toastify/dist/ReactToastify.css";
@@ -33,7 +33,36 @@ const AdminPage = () => {
 
   const navigate = useNavigate();
 
-  const [newBuerRequest, setNewBuerRequest] = useState('fetching')  
+  const bounce = cssTransition({
+    enter: "animate__animated animate__bounceIn",
+    exit: "animate__animated animate__bounceOut"
+  });
+  function animateCss() {
+    toast.success("مرحباً 👋, وصل طلب جديد!", {
+      transition: bounce
+    });
+  }
+
+  const [newBuerRequest, setNewBuerRequest] = useState('fetching') 
+  const Msg = ({reqDetaile}) => (
+    <Container>
+    <Row>
+      يوجد طلب جديد من:  🦄{newBuerRequest}
+      <Button>Retry</Button>
+      <Button  >InProgress</Button>
+    </Row>
+    </Container>
+  );
+
+
+  //const notify = () => toast(<Msg />, { 
+   const notify = () =>animateCss()
+
+  useEffect(() => {
+    dispatch(notify)
+
+  }, [newBuerRequest])
+
   useEffect(()=>{
     try {
       console.log('starting socket in client..')
@@ -48,6 +77,7 @@ const AdminPage = () => {
         setTimeout(()=>socket.connect(),5000)
       })
       socket.on('newBuerRequest', (data)=>setNewBuerRequest(data))
+
       console.log('newBuerRequest:', newBuerRequest)
     } catch (error) {
       console.log('Socket error Client:',error)
@@ -87,7 +117,7 @@ const AdminPage = () => {
   const [ buyerShopName,setBuyerShopName  ] = useState('')
   const [ requestid,setRequestid  ] = useState('')
   let [stateRequest, setStateRequest] = useState('')
-
+/*
   useEffect(() => {
     // opening a connection to the server to begin receiving events from it
     const eventSource = new EventSource("https://api.imagemarketing.net/addrequest");
@@ -101,22 +131,12 @@ const AdminPage = () => {
     // terminating the connection on component unmount
     return () => eventSource.close();
   }, []);
-
+*/
   const reqDetaile = {
     requestid: requestid,
     buyerShopName:buyerShopName
   }
-  const Msg = ({reqDetaile}) => (
-   
-    <Container>
-      
-    <Row>
-      يوجد طلب جديد من:  {buyerShopName}
-      <Button>Retry</Button>
-      <Button  >InProgress</Button>
-    </Row>
-    </Container>
-  );
+
 /*
     useEffect(() => {
       const notify = () => toast(<Msg />, {autoClose: false});
@@ -125,6 +145,7 @@ const AdminPage = () => {
 
     }, [stateRequest ='newRequest'])
 */
+/*
   const dispathNontification = (() => {
     buyerRequests.map((val)=>{
       const buyerShopName = val.buyerShopName;
@@ -142,6 +163,7 @@ const AdminPage = () => {
       }
     })
   })
+  */
 /*
   setTimeout(() => {
     dispathNontification()
