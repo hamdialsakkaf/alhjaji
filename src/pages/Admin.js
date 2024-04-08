@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import useLocalStorage from "use-local-storage";
 import Container from 'react-bootstrap/Container';
-import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Stack } from "react-bootstrap";
@@ -15,6 +14,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Nav from 'react-bootstrap/Nav';
+import Toast from 'react-bootstrap/Toast';
 import {io} from 'socket.io-client'
 
 // Importing toastify module
@@ -28,35 +28,55 @@ import { getBuyerRequests, setInprogressRequset } from "../redux/slices/getBuyer
 
 const AdminPage = () => {
   const dispatch = useDispatch()
+  const [currentPage, setCurrentPage] = useState(1);
 
   //let history = useHistory();
 
   const navigate = useNavigate();
 
+
+
   const bounce = cssTransition({
+    collapse: true,
     enter: "animate__animated animate__bounceIn",
-    exit: "animate__animated animate__bounceOut"
+    //exit: "animate__animated animate__bounceOut"
   });
   function animateCss() {
-    toast.success("مرحباً 👋, وصل طلب جديد!", {
-      transition: bounce
+    toast.success("مرحباً 👋, وصل طلب جديد!", {  
+      transition: bounce,
+      autoClose:false,
+      icon: "🚀"
+
     });
   }
 
-  const [newBuerRequest, setNewBuerRequest] = useState('fetching') 
-  const Msg = ({reqDetaile}) => (
-    <Container>
-    <Row>
-      يوجد طلب جديد من:  🦄{newBuerRequest}
-      <Button>Retry</Button>
-      <Button  >InProgress</Button>
-    </Row>
-    </Container>
+  const [newBuerRequest, setNewBuerRequest] = useState('اعلامات الطلبات الجديدة') 
+  const [newbuyerShopName, setNewbuyerShopName] = useState('') 
+
+  
+  const Msg = () => (
+    <Form.Text muted className="text-center">
+    <h4>
+    {newbuyerShopName}
+    </h4>
+    <h4>
+    {newBuerRequest}
+    </h4>
+    </Form.Text>
+
   );
 
 
+
+  const notify = () => {
+    toast.info(<Msg />,{
+      autoClose: false,
+      icon: "👍"
+    });
+  };
+
   //const notify = () => toast(<Msg />, { 
-   const notify = () =>animateCss()
+   //const notify = () =>animateCss()
 
   useEffect(() => {
     dispatch(notify)
@@ -76,7 +96,14 @@ const AdminPage = () => {
       socket.on('connect_error', ()=>{
         setTimeout(()=>socket.connect(),5000)
       })
-      socket.on('newBuerRequest', (data)=>setNewBuerRequest(data))
+      socket.on('newBuerRequest', (data)=>{
+        console.log('newBuerRequest', data.product)
+        console.log('data.buyerShopName', data.buyerShopName)
+
+        setNewBuerRequest(data.product)
+        setNewbuyerShopName(data.buyerShopName)
+
+      })
 
       console.log('newBuerRequest:', newBuerRequest)
     } catch (error) {
@@ -85,6 +112,10 @@ const AdminPage = () => {
   
 
 },[])
+
+const handlePagination = (pageNumber) => {
+  setCurrentPage(pageNumber);
+};
 
   /*
   axios.post("/newRequest",(req, res) => {
