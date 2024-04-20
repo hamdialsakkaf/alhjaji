@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams  } from 'react-router-dom';
-import Table from 'react-bootstrap/Table';
+import { useNavigate, useParams,useLocation  } from 'react-router-dom';
+import Container from 'react-bootstrap/Container';
 
+import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 //import { Customerlogin } from '../redux/slices/CustomersSlice';
-
+/*
 function getREFNO() {
     // Get the timestamp and convert 
     // it into alphanumeric input
@@ -15,17 +17,20 @@ function getREFNO() {
 
 // New REFNO 
 let day = getREFNO();
-
+*/
 //function Checkout() {
   const Checkout = () => {
-    let { tiresize } = useParams();
+    const params = useParams();
+        console.log('params params :',params.id)
 
+        const location = useLocation();
+        const state = location.state;
+        console.log('state state :',state)
+      
    // const persistStorage = localStorage.getItem("persist:root");
     //console.log('persistStorage:', persistStorage.SignIn)
     // const { tiresize, price } = state;
 
-    const dispatch = useDispatch()
-    const navigate = useNavigate();
 
     const getCustomerInfo = useSelector((state) => state.CustomerAccount)
     const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber,CustomerName,AddressStreet,AddressCity } = getCustomerInfo
@@ -34,12 +39,14 @@ let day = getREFNO();
     console.log('getSignIn SignIn:',SignIn)
     console.log('Customer Email :',CustomerEmail)
 
+    
     useEffect(()=>{
       
         if(!SignIn) {
           navigate("/customerlogin")
         } 
     },[SignIn])
+    const navigate = useNavigate();
 
 /*
     const addOrder = async (e) => {
@@ -63,8 +70,15 @@ let day = getREFNO();
 
    
     return (
-        <div className="MainPage">
+      <Container fluid="md" className="container">      
         <div className='PostContainer'>
+        <Button onClick={() => navigate(-2)}>
+        Go 2 pages back
+      </Button>
+      <Button  onClick={() => navigate(-1)}>Go back</Button>
+      <Button onClick={() => navigate(1)}>
+        Go forward
+      </Button>
         <Form.Text muted className="text-center">
       <h4>
         فاتورة الشراء
@@ -82,7 +96,7 @@ let day = getREFNO();
       <h4>الأيميل:  {CustomerEmail}  
        </h4>
       </Form.Text>
-      <Form.Text muted className="text-center">
+      <Form.Text  className="text-center">
       <h4>
         المدينة : {AddressCity}   
    </h4>
@@ -104,7 +118,7 @@ let day = getREFNO();
       <tbody>
         <tr>
           <td>1</td>
-          <td>{JSON.stringify(params)}</td>
+          <td>kkkk</td>
           <td>Otto</td>
           <td>@mdo</td>
           <td>@mdo</td>
@@ -125,8 +139,8 @@ let day = getREFNO();
       </tbody>
     </Table>
      </div>
-        </div>
-    )
+     </Container>
+         )
  }
  
-export default Checkout
+export default Checkout;

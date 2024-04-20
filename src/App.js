@@ -3,8 +3,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import {
   BrowserRouter,
-  Router,
-  Route
+  Routes,
+  Route,
+  Link,
+  Outlet
 } from "react-router-dom";
 
 //import useLocalStorage from "use-local-storage";
@@ -107,7 +109,8 @@ const handleLogout = () => {
     </Stack>
   </Col>
     </Row>
-    <Switch>
+    <BrowserRouter>
+    <Routes>
     <Route 
       // if you're not server rendering, this manages the
       // initial loading state
@@ -122,6 +125,11 @@ const handleLogout = () => {
             path="/"
             element={<HomePage />}
           />
+           <Route 
+           path="/checkout/:id"
+           element={<Checkout />}
+           
+           />
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/CustomerLogin" element={<CustomerLogin />} />
@@ -141,21 +149,12 @@ const handleLogout = () => {
         <Route path="/post/:postId" element={<Post />}/>
         <Route path="/tire/:tireId" element={<Tire />}/>
    
-          <Route 
-           path="/Checkout/:tiresize"
-           render={({ match }) => (
-             <Checkout tiresize={match.params.tiresize} />
-           )}
-           />
+         
 
-        <Route
-            path="/HomePage"
-            element={<HomePage />}
-          />
-      
       </Route>
     </Route>
-  </Switch>
+  </Routes>
+  </BrowserRouter>
  </Row>
 
 <Row>

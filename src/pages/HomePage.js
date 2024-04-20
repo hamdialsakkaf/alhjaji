@@ -2,7 +2,7 @@ import React,{useState,useEffect } from 'react'
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux'
 
-import {useNavigate,Link, useParams } from 'react-router-dom'
+import {useNavigate,Link, useParams,NavLink  } from 'react-router-dom'
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -143,7 +143,6 @@ let handleTireSizeChange = (e) => {
   //console.log('tire Change:', tire)
 }
 
-
     return (
       <div>
       <Container fluid="md" className="container">      
@@ -205,7 +204,11 @@ let handleTireSizeChange = (e) => {
       <Container>
         <Row>
                {
+                
+
                  tiresOnSize.map((val)=>{
+                  const product = {tiresize: val.tiresize, price: val.price}
+                  const id =val.id
                   //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
                   const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
                   + 'والمسعر بقيمة:'+ val.price  + 'دولار'
@@ -263,12 +266,24 @@ let handleTireSizeChange = (e) => {
                     </Button>
                     <div>
                     </div> 
-
-
-                <Button as="a" variant="danger" size="lg" href=  {()=>(navigate(`/Checkout/:${val.tiresize}`))} target='_blank'>
+                    
+                   
+                <Button as="a" variant="danger" size="lg" href=  {()=>(navigate(`/checkout/:${val.tiresize}`))} target='_blank'>
                        طلب شراء
                     </Button>
-                    <Link to={`Checkout/${val.tiresize}`}>ادفع</Link>
+                  
+                    <NavLink
+                      to={`/checkout/${id}`}
+                      /*
+                      className={({ isActive, isPending }) =>
+                        isPending ? "pending" : isActive ? "active" : ""
+                      }
+                      */
+                    >
+                      NavLink
+                    </NavLink>;
+                    <Link to={`/checkout/${id}`} state={val.id} >{val.id}</Link>
+
                     <div>
             </div>
 
