@@ -18,6 +18,7 @@ let day = getREFNO();
 
 //function Checkout() {
   const Checkout = () => {
+    let { tiresize } = useParams();
 
    // const persistStorage = localStorage.getItem("persist:root");
     //console.log('persistStorage:', persistStorage.SignIn)
@@ -29,7 +30,6 @@ let day = getREFNO();
     const getCustomerInfo = useSelector((state) => state.CustomerAccount)
     const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber,CustomerName,AddressStreet,AddressCity } = getCustomerInfo
     //const { SignIn, statusLogin, errorLogin } = getSignIn
-    const params = useParams();
 
     console.log('getSignIn SignIn:',SignIn)
     console.log('Customer Email :',CustomerEmail)

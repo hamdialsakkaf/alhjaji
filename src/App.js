@@ -107,8 +107,8 @@ const handleLogout = () => {
     </Stack>
   </Col>
     </Row>
-    <BrowserRouter>
-    <Routes
+    <Switch>
+    <Route 
       // if you're not server rendering, this manages the
       // initial loading state
       fallbackElement={<HomePage />}
@@ -141,9 +141,12 @@ const handleLogout = () => {
         <Route path="/post/:postId" element={<Post />}/>
         <Route path="/tire/:tireId" element={<Tire />}/>
    
-          <Route path="/Checkout/:tiresize" exact>
-          <Checkout />
-        </Route>
+          <Route 
+           path="/Checkout/:tiresize"
+           render={({ match }) => (
+             <Checkout tiresize={match.params.tiresize} />
+           )}
+           />
 
         <Route
             path="/HomePage"
@@ -151,8 +154,8 @@ const handleLogout = () => {
           />
       
       </Route>
-    </Routes>
-  </BrowserRouter>
+    </Route>
+  </Switch>
  </Row>
 
 <Row>
