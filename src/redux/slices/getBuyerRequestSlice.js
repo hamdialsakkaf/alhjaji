@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
 
 import axios from 'axios'
-import { updateInprogressReq } from '../../apis/apis'
 
 //const url = 'https://jsonplaceholder.typicode.com/posts'
 const url = 'http://api.imagemarketing.net/getBuyerRequest'
@@ -38,7 +37,7 @@ const initialState = {
        async (data,thunkAPI) => {
       try {
         console.log('Inprogress requestid:',data)
-        updateInprogressReq(data)
+        //updateInprogressReq(data)
 
         return data
 

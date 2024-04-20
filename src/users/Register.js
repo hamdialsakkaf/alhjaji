@@ -6,6 +6,7 @@ import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import bcrypt from 'bcryptjs'
+import { Link } from 'react-router-dom';
 
 //import { useHistory } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
@@ -45,6 +46,7 @@ function Register() {
         <h4>
                   <Badge bg="secondary">{msg}</Badge>
               </h4>
+              <Link to="/kurimiRegister">About</Link>
         <Form>
                                     <Form.Group className="mb-3" controlId="formGridAddress1">
                                         <FloatingLabel

@@ -1,8 +1,9 @@
 import React,{useState,useEffect } from 'react'
 import axios from 'axios';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
-import {useNavigate} from 'react-router-dom'
+import {useNavigate,Link, useParams } from 'react-router-dom'
+
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -20,12 +21,15 @@ import '../App.css';
  
 // Import toastify css file
 import {io} from 'socket.io-client'
-
+import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
 //Axios.defaults.baseurl = process.env.react_app_be_url;
   const HomePage = () => {
     const dispatch = useDispatch()
 
- 
+    const getCustomerInfo = useSelector((state) => state.CustomerAccount)
+    const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
+
+
     const [time, setTime] = useState('fetching')  
     useEffect(()=>{
       try {
@@ -66,14 +70,39 @@ import {io} from 'socket.io-client'
     //const hankkokLogo = "https://logonoid.com/images/hankook-logo.png"
 
     const navigate = useNavigate()
-/*
-    useEffect(async()=>  {
-     await axios.get('https://api.imagemarketing.net/getire',
-    ).then((res)=>{
-      setTireList(res.data);
-    })
-    },[])
-    */
+
+    //console.log(' loginCustomer:', loginCustomer)
+  
+    // Updating the local storage whenever 
+    // the login state changes
+    /*
+    useEffect(() => {
+      console.log('loginCustomer state :', loginCustomer)
+      //localStorage.setItem("login", JSON.stringify(login));
+      //localStorage.setItem("login", login);
+      setLoginCustomer(SignIn);
+    }, [SignIn]);
+  */
+    // Click Handler updates the login state
+    // when the button is clicked
+ /*
+    useEffect(()=>{
+      if(localStorage.getItem("loginCustomerStorage")){
+          const loginCustomerStorage = JSON.parse(localStorage.getItem("loginCustomerStorage"))
+          console.log('login loginCustomerStorage:', loginCustomerStorage)
+          //setAuthCustomer(loginCustomerStorage);
+           //return login;
+      }
+      /*
+      if(authCustomer) {
+         navigate('/HomePage')
+      } else {
+          navigate('/customerlogin')
+      }
+      
+  },[SignIn])
+  */
+    
     const getData = async() => {
      await axios.get('https://api.imagemarketing.net/getire',
     ).then((data)=>{
@@ -113,10 +142,14 @@ let handleTireSizeChange = (e) => {
   setTireSize(e.target.value)
   //console.log('tire Change:', tire)
 }
+
+
     return (
       <div>
       <Container fluid="md" className="container">      
       <Stack  gap={1} className="container mx-auto">
+    
+      
       <Form.Text muted className="text-center">
       <h4>
       أهلاً بك في شركة الحجاجي للتجارة العامة - أجتكو 
@@ -173,7 +206,6 @@ let handleTireSizeChange = (e) => {
         <Row>
                {
                  tiresOnSize.map((val)=>{
-                    
                   //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
                   const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
                   + 'والمسعر بقيمة:'+ val.price  + 'دولار'
@@ -204,6 +236,7 @@ let handleTireSizeChange = (e) => {
                     <Card.Title><Badge bg="warning" text="dark">
                 اطارات    {val.brandname }
                      </Badge>
+                
                      <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.id}`))}>{val.tiresize}</h1>       
                      </Card.Title>
                     <Card.Text>
@@ -228,6 +261,17 @@ let handleTireSizeChange = (e) => {
                 <Button as="a" variant="danger" size="lg" href={url} target='_blank'>
                        شراء
                     </Button>
+                    <div>
+                    </div> 
+
+
+                <Button as="a" variant="danger" size="lg" href=  {()=>(navigate(`/Checkout/:${val.tiresize}`))} target='_blank'>
+                       طلب شراء
+                    </Button>
+                    <Link to={`Checkout/${val.tiresize}`}>ادفع</Link>
+                    <div>
+            </div>
+
                 <Table striped bordered hover variant="dark" responsive>
                     <thead>
                    

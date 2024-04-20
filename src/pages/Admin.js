@@ -34,8 +34,6 @@ const AdminPage = () => {
 
   const navigate = useNavigate();
 
-
-
   const bounce = cssTransition({
     collapse: true,
     enter: "animate__animated animate__bounceIn",
@@ -117,89 +115,22 @@ const handlePagination = (pageNumber) => {
   setCurrentPage(pageNumber);
 };
 
-  /*
-  axios.post("/newRequest",(req, res) => {
-   
-    console.log('new request added')
- })
- */
- 
-  /*
-  const getData = async() => {
-    await axios.get('http://api.imagemarketing.net/getBuyerRequest',
-   ).then((data)=>{
-    setBuyerRequests(data.data)
-   })
-   }
- */
-
-/*
-   useEffect(async()=> {
-     await getData()
-  }, [])
-*/
      // Get the gtTires from the store
      const getbuyerRequestsState = useSelector((state) => state.buyerRequests)
      const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
 
-  
   //console.log('buyerRequests:', buyerRequests)
   //console.log(' buyerRequests.stateRequest:',  buyerRequests.stateRequest)
   const [ buyerShopName,setBuyerShopName  ] = useState('')
   const [ requestid,setRequestid  ] = useState('')
   let [stateRequest, setStateRequest] = useState('')
-/*
-  useEffect(() => {
-    // opening a connection to the server to begin receiving events from it
-    const eventSource = new EventSource("https://api.imagemarketing.net/addrequest");
-    
-    // attaching a handler to receive message events
-    eventSource.onmessage = (event) => {
-      const stockData = JSON.parse(event.data);
-      console.log('new Request from server')
-    };
-    
-    // terminating the connection on component unmount
-    return () => eventSource.close();
-  }, []);
-*/
+
   const reqDetaile = {
     requestid: requestid,
     buyerShopName:buyerShopName
   }
 
-/*
-    useEffect(() => {
-      const notify = () => toast(<Msg />, {autoClose: false});
 
-      dispatch(notify)
-
-    }, [stateRequest ='newRequest'])
-*/
-/*
-  const dispathNontification = (() => {
-    buyerRequests.map((val)=>{
-      const buyerShopName = val.buyerShopName;
-      const Requestid = val.request_id;
-      const stateRequest = val.stateRequest
-      console.log('Requestid admin', Requestid)
-      console.log('Requestid stateRequest', stateRequest)
-
-      console.log('admin buyerShopName', buyerShopName)
-      if (stateRequest == 'newRequest') {
-        setStateRequest(stateRequest)
-        setBuyerShopName(buyerShopName)
-        setRequestid(Requestid)
-
-      }
-    })
-  })
-  */
-/*
-  setTimeout(() => {
-    dispathNontification()
-  }, 5000);
-  */
      useEffect(() => {
       // eslint-disable-next-line no-unused-vars
       let isMounted = true
@@ -217,34 +148,11 @@ const handlePagination = (pageNumber) => {
 
 
  // const [username, setUsername] = useLocalStorage("name", "");
-/*
- if (stateRequest == 'Inprogress') {
-  dispatch(notify)
-}
-*/
 
-/*
-  useEffect(() => {
-    if (stateRequest == 'Inprogress') {
-      <div>
-      <ToastContainer  transition={Slide} autoClose={2000} />
-    </div>
-      
-    }
-  }, [stateRequest])
-  */
+
   const [login, setLogin] = useLocalStorage("login", "false");
   console.log('login getLogin:', login)
-  /*
-    // useState hook to keep track of the login state
-    const [login, setLogin] = useState(() => {
-      //return JSON.parse(localStorage.getItem("login"));
-      const login = JSON.parse(localStorage.getItem("login"));
-      console.log('login getLogin:', login)
-      //console.log('typeof',typeof login)
-      return login
-    });
-*/
+
   // Updating the local storage whenever 
   // the login state changes
   useEffect(() => {
@@ -254,13 +162,6 @@ const handlePagination = (pageNumber) => {
     setLogin(login);
   }, [login]);
 
-
-  //const loginlocal = JSON.parse(localStorage.getItem("login"));
-  //console.log('Login loginlocal:', loginlocal)
-  //const login = Boolean(localStorage.getItem("login"))
-  //console.log('login effect:', login)
-  //login = Boolean(login)
-  //console.log('login Boolean:', login)
 
   // Click Handler updates the login state
   // when the button is clicked

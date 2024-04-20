@@ -5,11 +5,15 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Badge from 'react-bootstrap/Badge';
+import { Link } from 'react-router-dom';
+
 import bcrypt from 'bcryptjs'
 
 //import { useHistory } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 function Login() {
+    const navigate = useNavigate();
+    const [auth, setAuth] = useState(false);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,17 +22,17 @@ function Login() {
       // useState hook to inform the user about the loading state
     const [loading, setLoading] = useState(true);
 
-    const [auth, setAuth] = useState(false);
     
     const hashedPassword = bcrypt.hashSync(password, '$2a$10$CwTycUXWue0Thq9StjUM0u') // hash created previously created upon sign up
     //let history = useHistory();
-    const navigate = useNavigate();
+    const globalVariable = 0;
+
     useEffect(()=>{
         if(localStorage.getItem("login")){
             const login = JSON.parse(localStorage.getItem("login"))
             console.log('login effect:', login)
             setAuth(login);
-            // return true;
+             //return login;
         }
         if(auth) {
            navigate('/AdminPage')
@@ -84,6 +88,9 @@ function Login() {
     return (
         <div className="MainPage">
         <div className='PostContainer'>
+            <div>
+            <Link to="/CustomerLogin">Customer Login</Link>
+            </div>
         <Form>
                          <h4>
                             <Badge bg="secondary">{msg}</Badge>
