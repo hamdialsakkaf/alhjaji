@@ -1,11 +1,9 @@
 import React from 'react'
 import axios from 'axios';
 //import  Axios  from '../config'
-//import { useHistory } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-    const history = useNavigate();
+    //const history = useNavigate();
  
     const Logout = async () => {
         if(localStorage.getItem("login")){

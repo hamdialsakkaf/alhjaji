@@ -1,7 +1,9 @@
 import React, { useState, useEffect} from "react";
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
+import { useParams,useLocation,useNavigate    } from "react-router-dom";
+
 import useLocalStorage from "use-local-storage";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -30,7 +32,6 @@ const AdminPage = () => {
   const dispatch = useDispatch()
   const [currentPage, setCurrentPage] = useState(1);
 
-  //let history = useHistory();
 
   const navigate = useNavigate();
 
@@ -161,7 +162,6 @@ const handlePagination = (pageNumber) => {
     //localStorage.setItem("login", login);
     setLogin(login);
   }, [login]);
-
 
   // Click Handler updates the login state
   // when the button is clicked

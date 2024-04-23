@@ -1,7 +1,9 @@
 import React,{useState,useEffect} from 'react'
 //import Axios from  'axios'
 import  Axios  from '../config';
-import {useNavigate} from 'react-router-dom'
+//import {useNavigate} from 'react-router-dom'
+import { useParams,useLocation,useNavigate    } from "react-router-dom";
+
 import '../App.css'
 
 function MainPage() {

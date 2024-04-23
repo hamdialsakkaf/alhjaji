@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react'
+//import { useNavigate } from 'react-router-dom'
+import { useParams,useLocation,useNavigate, Link } from "react-router-dom";
+
 import axios from 'axios';
 //import  Axios  from '../config'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Badge from 'react-bootstrap/Badge';
-import { Link } from 'react-router-dom';
+//import { Link } from 'react-router-dom';
 
 import bcrypt from 'bcryptjs'
 
-//import { useHistory } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+
 function Login() {
     const navigate = useNavigate();
     const [auth, setAuth] = useState(false);
@@ -24,7 +26,7 @@ function Login() {
 
     
     const hashedPassword = bcrypt.hashSync(password, '$2a$10$CwTycUXWue0Thq9StjUM0u') // hash created previously created upon sign up
-    //let history = useHistory();
+
     const globalVariable = 0;
 
     useEffect(()=>{
@@ -89,7 +91,7 @@ function Login() {
         <div className="MainPage">
         <div className='PostContainer'>
             <div>
-            <Link to="/CustomerLogin">Customer Login</Link>
+            <Link to="/customerLogin">Customer Login</Link>
             </div>
         <Form>
                          <h4>

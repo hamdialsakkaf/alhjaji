@@ -8,7 +8,6 @@ import { store  } from './redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import { BrowserRouter } from 'react-router-dom';
-import { LocationProvider } from "@reach/router";
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -27,11 +26,16 @@ root.render(
 */
 
 root.render(
+  <React.StrictMode>
+     <BrowserRouter future={{ v7_startTransition: true }}>
     <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
     <App />
     </PersistGate>
     </Provider>
+    </BrowserRouter>
+
+    </React.StrictMode>
 );
 
 

@@ -10,8 +10,6 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import bcrypt from 'bcryptjs'
 import { postKurimiRegister } from '../redux/slices/CustomersSlice';
 
-//import { useHistory } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
 
 function KuraimiRegister() {
 

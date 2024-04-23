@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
+import { useParams,useLocation,useNavigate    } from "react-router-dom";
+
 import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -12,13 +14,11 @@ import { Customerlogin } from '../redux/slices/CustomersSlice';
 
 
 function CustomerLogin() {
+    const navigate = useNavigate();
    // const persistStorage = localStorage.getItem("persist:root");
     //console.log('persistStorage:', persistStorage.SignIn)
 
     const dispatch = useDispatch()
-    const navigate = useNavigate();
-
-
 
     const getCustomerInfo = useSelector((state) => state.CustomerAccount)
     const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
@@ -37,8 +37,8 @@ function CustomerLogin() {
 
     
     const hashedPassword = bcrypt.hashSync(password, '$2a$10$CwTycUXWue0Thq9StjUM0u') // hash created previously created upon sign up
-    //let history = useHistory();
-/*
+
+    /*
     const getLoginStorage = (()=> {
         if(localStorage.getItem("customerlogin")){
             const customerloginState = JSON.parse(localStorage.getItem("customerlogin"))

@@ -8,8 +8,6 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import bcrypt from 'bcryptjs'
 import { Link } from 'react-router-dom';
 
-//import { useHistory } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
 
 function Register() {
     const [name, setName] = useState('');
@@ -19,7 +17,6 @@ function Register() {
 
     const [confPassword, setConfPassword] = useState('');
     const [msg, setMsg] = useState('');
-    const history = useNavigate();
  
     const submitUser = async (e) => {
         e.preventDefault();
@@ -37,7 +34,6 @@ function Register() {
                 setMsg('خطأ في تسجيل المستخدم')
             }
             )
-            //history.push("/");
         
     }
     return (

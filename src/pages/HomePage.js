@@ -1,8 +1,8 @@
 import React,{useState,useEffect } from 'react'
+//import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux'
-
-import {useNavigate,Link, useParams,NavLink  } from 'react-router-dom'
+import { useParams,useLocation,useNavigate,Navigate } from "react-router-dom";
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -16,6 +16,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Nav from 'react-bootstrap/Nav';
 import Stack from 'react-bootstrap/Stack';
 import { FloatingLabel } from 'react-bootstrap';
+
 import '../App.css';
 // Importing toastify module
  
@@ -24,6 +25,7 @@ import {io} from 'socket.io-client'
 import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
 //Axios.defaults.baseurl = process.env.react_app_be_url;
   const HomePage = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch()
 
     const getCustomerInfo = useSelector((state) => state.CustomerAccount)
@@ -69,7 +71,6 @@ import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
     //let [tirelogo, setTireLogo] = useState("")
     //const hankkokLogo = "https://logonoid.com/images/hankook-logo.png"
 
-    const navigate = useNavigate()
 
     //console.log(' loginCustomer:', loginCustomer)
   
@@ -207,8 +208,9 @@ let handleTireSizeChange = (e) => {
                 
 
                  tiresOnSize.map((val)=>{
-                  const product = {tiresize: val.tiresize, price: val.price}
-                  const id =val.id
+                  const {id, tiresize, brandname, image,price} = val;
+                  const path = `checkout/${price}/product/${tiresize}`
+                  
                   //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
                   const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
                   + 'والمسعر بقيمة:'+ val.price  + 'دولار'
@@ -262,29 +264,16 @@ let handleTireSizeChange = (e) => {
                 </ListGroup>
                 <div> </div> 
                 <Button as="a" variant="danger" size="lg" href={url} target='_blank'>
-                       شراء
+                      شراء واتس اب
                     </Button>
                     <div>
                     </div> 
                     
-                   
-                <Button as="a" variant="danger" size="lg" href=  {()=>(navigate(`/checkout/:${val.tiresize}`))} target='_blank'>
-                       طلب شراء
-                    </Button>
-                  
-                    <NavLink
-                      to={`/checkout/${id}`}
-                      /*
-                      className={({ isActive, isPending }) =>
-                        isPending ? "pending" : isActive ? "active" : ""
-                      }
-                      */
-                    >
-                      NavLink
-                    </NavLink>;
-                    <Link to={`/checkout/${id}`} state={val.id} >{val.id}</Link>
-
-                    <div>
+                  <Button as="a" href={`checkout/${price}/product/${tiresize}`} target="_blank" variant="primary">
+                    شراء
+                  </Button>
+                  <Button href={`checkout/${price}/product/${tiresize}`}>شراء</Button> 
+               <div>
             </div>
 
                 <Table striped bordered hover variant="dark" responsive>
@@ -331,14 +320,16 @@ let handleTireSizeChange = (e) => {
            {//tireList.map((val)=>{
              // Array.isArray(tireList) ?
                  tireList.map((val)=>{
+                  const {id, tiresize, brandname, image,price} = val;
+
                  //  const url ='https://web.whatsapp.com/send?phone=967775955150&text='
                   // + ' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
-                   const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
-                   + 'والمسعر بقيمة:'+ val.price  + 'دولار'
+                   const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +brandname+ ' المقاس:'+ val.tiresize 
+                   + 'والمسعر بقيمة:'+ price  + 'دولار'
             return (
              <Col sm={4} xs="auto">
               <Card 
-              key={val.id} 
+              key={id} 
               sm={4}
                 bg="primary"
                 text='white'
@@ -347,22 +338,22 @@ let handleTireSizeChange = (e) => {
                 <Card.Header>
                   <Nav variant="pills" defaultActiveKey="#first">
                     <Nav.Item>
-                      <Nav.Link  onClick={()=>(navigate(`/tire/${val.id}`))}>مواصفات</Nav.Link>
+                      <Nav.Link  onClick={()=>(navigate(`/tire/${id}`))}>مواصفات</Nav.Link>
                     </Nav.Item>
                   </Nav>
              </Card.Header>
-                  <Card.Img variant="top" src={val.image}  />
+                  <Card.Img variant="top" src={image}  />
                   <Card.Body>
                     <Card.Title><Badge bg="warning" text="dark">
-                    اطار {val.brandname } 
+                    اطار {brandname } 
                      </Badge>
-                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.id}`))}>{val.tiresize}</h1>       
+                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${id}`))}>{tiresize}</h1>       
                      </Card.Title>
 
                     <Card.Text>
-                    {val.tiresize}
+                    {tiresize}
                     <h3>
-                     <Badge bg="secondary">{val.price} </Badge> دولار
+                     <Badge bg="secondary">{price} </Badge> دولار
                    </h3>
                     </Card.Text>
                     <Button as="a" variant="primary" href={url} target='_blank'>شراء </Button>
@@ -375,7 +366,7 @@ let handleTireSizeChange = (e) => {
                   <ListGroup.Item> 
                   <Button variant="outline-danger" onClick={yemeniRials}>اضغط هنا للسعر بالريال</Button>
                 <h5>
-                ريال يمني<Badge bg="secondary">{productrialprice = (DolarexchangeRial * val.price)} </Badge> 
+                ريال يمني<Badge bg="secondary">{productrialprice = (DolarexchangeRial * price)} </Badge> 
                 </h5></ListGroup.Item>
                   <Button as="a" variant="danger" size="lg" href={url} target='_blank'>
                        شراء
