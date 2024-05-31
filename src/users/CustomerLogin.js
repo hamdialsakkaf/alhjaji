@@ -10,7 +10,7 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Badge from 'react-bootstrap/Badge';
 import bcrypt from 'bcryptjs'
 
-import { Customerlogin } from '../redux/slices/CustomersSlice';
+import { custlogin } from '../redux/slices/CustomersSlice';
 
 
 function CustomerLogin() {
@@ -52,9 +52,9 @@ function CustomerLogin() {
     useEffect(()=>{
       
         if(SignIn) {
-           navigate('/HomePage')
+           navigate('/')
         } else {
-            navigate("/customerlogin")
+            navigate("/Customerlogin")
         }
     },[SignIn])
 
@@ -84,7 +84,7 @@ useEffect(()=>{
              }
       
             try {
-                dispatch(Customerlogin(customer))
+                dispatch(custlogin(customer))
 
             } catch (error) {
 
@@ -93,6 +93,7 @@ useEffect(()=>{
         
     }
 
+    
     const submitAuth = async (e) => {
         e.preventDefault();
         try {
@@ -103,14 +104,14 @@ useEffect(()=>{
                 passowrd: hashedPassword
             }
             //await axios.post('https://api.agtco.info/api/login', 
-            await axios.post('https://api.imagemarketing.net/Customerlogin', 
+            await axios.post('http://localhost:5000/customerlogin', 
             customer
             ).then((data)=>{
                // setPermissions(data.data[0].Permissions)
                if(hashedPassword === data.data[0].password) {
                 localStorage.setItem("customerlogin", 'true');
                // setAuth(true);
-                 navigate("/HomePage", { replace: true });
+                 navigate("/", { replace: true });
                     } else {    
                        // setAuth(false);
                         setMsg('كلمة السر غير مطابقة!، تأكد من كلمة السر ثم عاود المحاولة. شكراً')

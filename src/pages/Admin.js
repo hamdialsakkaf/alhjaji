@@ -26,10 +26,21 @@ import { Bounce,Slide,toast,ToastContainer,cssTransition } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
 
 //import { getGtItems } from "../redux/slices/gtSlice";
-import { getBuyerRequests, setInprogressRequset } from "../redux/slices/getBuyerRequestSlice";
+//import { getBuyerRequests, setInprogressRequset } from "../redux/slices/getBuyerRequestSlice";
+import { getBuyerRequests } from "../redux/slices/getBuyerRequestSlice";
 
 const AdminPage = () => {
   const dispatch = useDispatch()
+   // Get the gtTires from the store
+   const getbuyerRequestsState = useSelector((state) => state.buyerRequests)
+   const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
+ 
+console.log('buyerRequests:', buyerRequests)
+//console.log(' buyerRequests.stateRequest:',  buyerRequests.stateRequest)
+const [ buyerShopName,setBuyerShopName  ] = useState('')
+const [ requestid,setRequestid  ] = useState('')
+let [stateRequest, setStateRequest] = useState('')
+
   const [currentPage, setCurrentPage] = useState(1);
 
 
@@ -82,10 +93,11 @@ const AdminPage = () => {
 
   }, [newBuerRequest])
 
+  
   useEffect(()=>{
     try {
       console.log('starting socket in client..')
-      const socket = io('https://api.imagemarketing.net', {
+      const socket = io('http://localhost:5000', {
         //withCredentials: true,
         extraHeaders: {
           "Access-Control-Allow-Origin": "*"
@@ -116,16 +128,7 @@ const handlePagination = (pageNumber) => {
   setCurrentPage(pageNumber);
 };
 
-     // Get the gtTires from the store
-     const getbuyerRequestsState = useSelector((state) => state.buyerRequests)
-     const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
-
-  //console.log('buyerRequests:', buyerRequests)
-  //console.log(' buyerRequests.stateRequest:',  buyerRequests.stateRequest)
-  const [ buyerShopName,setBuyerShopName  ] = useState('')
-  const [ requestid,setRequestid  ] = useState('')
-  let [stateRequest, setStateRequest] = useState('')
-
+    
   const reqDetaile = {
     requestid: requestid,
     buyerShopName:buyerShopName
@@ -174,7 +177,7 @@ const handlePagination = (pageNumber) => {
   }
  
 	return(
-    <Container>
+    <Container >
         <ToastContainer />
             {
         login ? (
@@ -206,6 +209,8 @@ const handlePagination = (pageNumber) => {
       <Container>
         <Row>
               <Form.Text muted className="text-center">
+                <h5>{statusBR}</h5>
+                <h5>{errorGt}</h5>
                 <h4>
                     طلب جديد من:  
                 </h4>

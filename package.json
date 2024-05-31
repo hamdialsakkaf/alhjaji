@@ -1,7 +1,7 @@
 {
   "name": "alhjaji",
   "version": "0.1.0",
-  "homepage": "http://imagemarketing.net/",
+  "homepage": "https://alhjaji.com",
   "private": true,
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

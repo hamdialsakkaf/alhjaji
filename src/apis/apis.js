@@ -3,7 +3,7 @@ import axios from "axios";
  
 export async function addRequestToDB (buyerReq)  {
   try {
-    await axios.post('https://api.imagemarketing.net/addrequest',
+    await axios.post('http://localhost:5000/addrequest',
       buyerReq 
     ).then((response)=> {
     console.log(response.data);
@@ -25,7 +25,7 @@ export async function addRequestToDB (buyerReq)  {
    export async function addKurimiCustomerToDB (user)  {
       console.log('customer data:', user)
     
-      await axios.post('https://api.imagemarketing.net/kurimiusersReg',
+      await axios.post('http://localhost:5000/kurimiusersReg',
       user
     )
     //.catch((err) => {

@@ -62,7 +62,7 @@ const handleLogout = () => {
         <Nav className="me-auto">
           <Nav.Link href="/">الرئيسية</Nav.Link>
           <NavDropdown title="المستخدم" id="basic-nav-dropdown">           
-            <NavDropdown.Item href="/customerLogin"
+            <NavDropdown.Item href="/CustomerLogin"
             >
                <Button onClick={handleLogout}>تسجيل الخروج</Button>
                تسجيل الخروج</NavDropdown.Item>
@@ -114,7 +114,7 @@ const handleLogout = () => {
 
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/customerLogin" element={<CustomerLogin />} />
+        <Route path="/CustomerLogin" element={<CustomerLogin />} />
        
          <Route  
          path="/AdminPage" 
@@ -161,7 +161,7 @@ const handleLogout = () => {
          <NavDropdown.Item href="/login">
            تسجيل الدخول
          </NavDropdown.Item>
-         <NavDropdown.Item href="/customerLogin">دخول العملاء</NavDropdown.Item>
+         <NavDropdown.Item href="/CustomerLogin">دخول العملاء</NavDropdown.Item>
          <NavDropdown.Divider />
       
        </NavDropdown>
@@ -175,7 +175,7 @@ const handleLogout = () => {
      <div>
        <Badge>{statusLogin}</Badge>
        <div>
-       <Button as="a" href="/customerLogin" variant="primary">
+       <Button as="a" href="/Customerlogin" variant="primary">
        تسجيل الدخول
        </Button>
          </div>
@@ -210,7 +210,7 @@ const handleLogout = () => {
 
      <Route path="/register" element={<Register />} />
      <Route path="/login" element={<Login />} />
-     <Route path="/customerLogin" element={<CustomerLogin />} />
+     <Route path="/Customerlogin" element={<CustomerLogin />} />
     
       <Route  
       path="/AdminPage" 

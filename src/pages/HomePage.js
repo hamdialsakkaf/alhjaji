@@ -33,10 +33,11 @@ import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
 
 
     const [time, setTime] = useState('fetching')  
+  
     useEffect(()=>{
       try {
         console.log('starting socket in client..')
-        const socket = io('https://api.imagemarketing.net', {
+        const socket = io('http://localhost:5000', {
           //withCredentials: true,
           extraHeaders: {
             "Access-Control-Allow-Origin": "*"
@@ -103,16 +104,53 @@ import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
       
   },[SignIn])
   */
+
+  /*
+      Axios.get("https://api.alhjaji.com/get",{
+            mode: 'cors',
+            headers: {
+             "Content-Type": "application/json",
+         },
+           }).then((data)=> {
+
+       
+            setPostList(data.data)
+        })
+  */
     
-    const getData = async() => {
-     await axios.get('https://api.imagemarketing.net/getire',
-    ).then((data)=>{
-      setTireList(data.data)
-    })
+    const getData = () => {
+      try {
+        axios.get("http://localhost:5000/getire",{
+        
+         }).then((res)=> {
+          setTireList(res.data)
+          //console.log('responseData:',res.data)
+
+      })
+      } catch (error) {
+        // Handle error
+        console.error(error);
+      }
+    };
+
+    const fitchTiresFromTireSize = (size) => {
+      try {
+        axios.get(`http://localhost:5000/getFromTireSize/${size}`,{
+        
+         }).then((res)=> {
+          setTireOnSize(res.data)
+          console.log('setTireOnSize:',res.data)
+
+      })
+      } catch (error) {
+        // Handle error
+        console.error('fitchTiresFromTireSize error',error);
+      }
     }
+
   
-    useEffect(async()=> {
-      await getData()
+    useEffect(()=> {
+       getData()
    }, [])
         /*
       window.addEventListener("beforeunload", (event)=> {
@@ -124,15 +162,11 @@ import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
       })
   //}
         useEffect(()=>{
-          //axios.get(`https://api.alhjaji.com/getFromTireSize/${tiresize}`).then((data)=>
-          axios.get(`https://api.imagemarketing.net/getFromTireSize/${tiresize}`).then((res)=>
-          {
-            setTireOnSize(res.data);
-        })
+          fitchTiresFromTireSize(tiresize)
           },[tiresize])
-
+          
         const yemeniRials = ()=> {
-          axios.get(`https://api.imagemarketing.net/getexchangeDolar`).then((data)=>{
+          axios.get(`http://localhost:5000/getexchangeDolar`).then((data)=>{
             setDolarexchangeRial(data.data[0].DolarexchangeRial);
             setProductRialPrice(productprice * DolarexchangeRial)
          })

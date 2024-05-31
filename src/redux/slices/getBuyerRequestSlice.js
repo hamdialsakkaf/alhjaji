@@ -4,9 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 
 //const url = 'https://jsonplaceholder.typicode.com/posts'
-const url = 'http://api.imagemarketing.net/getBuyerRequest'
 
-const urlInprogress = 'http://api.imagemarketing.net/Inprogress'
+const urlInprogress = 'http://localhost:5000/Inprogress'
 
 const initialState = {
     //GtItems: [],
@@ -19,19 +18,33 @@ const initialState = {
     //notificationPop: false
   }
 
+  const url = 'http://localhost:5000/getBuyerRequest'
   // Get all the posts from the API
 //export const getGtItems = createAsyncThunk('posts/getGtItems', async (thunkAPI) => {
-  export const getBuyerRequests = createAsyncThunk('buyerRequests/getBuyerRequests', async (thunkAPI) => {
+  export const getBuyerRequests = createAsyncThunk(
+    'buyerRequests/getBuyerRequest',
+    // async (thunkAPI) => {
+      async (thunkAPI) => {
+
     try {
-      const res = await axios.get(url)
+      console.log('getBuyerRequests Slic',)
+      const res = await axios.get('http://localhost:5000/getBuyerRequest')
+      
       console.log('buyerRequests:', res.data)
       return res.data
-    } catch (err) {
-      // console.error(err.message)
-      return thunkAPI.rejectWithValue({ error: err.message })
-    }
+    } catch (error) {
+      console.log('error getBuyerRequests:')
+
+      // return custom error message from backend if present
+        if (error.response && error.response.data.message) {
+          return thunkAPI.rejectWithValue(error.response.data.message)
+        } else {
+          return thunkAPI.rejectWithValue(error.message)
+        }
+      }
   })
 
+  /*
   // تحديث حالة الطلب قيد التنفيذ
     export const setInprogressRequset = createAsyncThunk('buyerRequests/setInprogressRequset',
        async (data,thunkAPI) => {
@@ -41,7 +54,7 @@ const initialState = {
 
         return data
 
-/*
+
        await axios.post(urlInprogress, {
         requestid:requestid,
           //stateRequest: 'Inprogress',
@@ -52,17 +65,26 @@ const initialState = {
         .catch(function (error) {
           console.log(error);
         });
-*/
+
       } catch (err) {
          console.error(err.message)
-        //return thunkAPI.rejectWithValue({ error: err.message })
+        return thunkAPI.rejectWithValue({ error: err.message })
       }
     })
+    */
   export const filterGtFunction = createAsyncThunk(
     "basket/filterGtFunction",
     async (data, thunkAPI) => {
-      console.log('addBuyerRequest Thunk:', data)
-      return data
+      try {
+        console.log('addBuyerRequest Thunk:', data)
+        return data
+      } catch (error) {
+        console.log('error filterGtFunction:')
+
+        return thunkAPI.rejectWithValue(error.message)
+
+      }
+    
     }
   )
 
@@ -105,25 +127,8 @@ const initialState = {
         
                 console.error('errorGt',state.errorGt)
           })
-          .addCase(setInprogressRequset.fulfilled, (state, action) => {
-            // action is inferred correctly here if using TS
-             // When data is fetched successfully
-                state.statusRequest = 'InProgress'
-        
-                // Concat the new data to the existing data in the array
-               // state.buyerRequests = state.buyerRequests.concat(action.payload)
-                //state.GtItems = state.GtItems.push(action.payload)
-               // dispatch(notify )
-          })
-          .addCase(setInprogressRequset.rejected, (state, action) => {
-           // When data is fetched unsuccessfully
-                state.statusRequest = 'failed'
-        
-                // Update the error message for proper error handling
-                //state.errorRequest = action.error.message
-        
-                console.error('errorRequest',state.errorRequest)
-          })
+      
+       
           // and provide a default case if no other handlers matched
           .addDefaultCase((state, action) => {})
       },

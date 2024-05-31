@@ -51,7 +51,7 @@ function Login() {
                 passowrd: hashedPassword
             }
             //await axios.post('https://api.agtco.info/api/login', 
-            await axios.post('https://api.imagemarketing.net/login', 
+            await axios.post('http://localhost:5000/adminlogin', 
                 user
             ).then((data)=>{
                 setPermissions(data.data[0].Permissions)

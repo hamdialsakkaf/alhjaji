@@ -55,8 +55,8 @@ const initialState = {
   })
 
     // Get all the getLogin from the API
-export const Customerlogin = createAsyncThunk(
-  'login/Customerlogin', 
+export const custlogin = createAsyncThunk(
+  'login/customerlogin', 
   async (userdata,{rejectWithValue }) => {
   console.log('getLogin userdata:', userdata['mobileNumber'] + userdata['passowrd'])
   const user = {
@@ -65,7 +65,7 @@ export const Customerlogin = createAsyncThunk(
   }
   // الاوصل الصالح مع try
  try { 
-    const res = await axios.post('https://api.imagemarketing.net/Customerlogin', 
+    const res = await axios.post('http://localhost:5000/customerlogin', 
      //await axios.post('https://api.imagemarketing.net/Customerlogin', 
       user
   )
@@ -85,10 +85,8 @@ export const Customerlogin = createAsyncThunk(
 export const CustomerLogOut = createAsyncThunk(
  // 'kurimi/CustomerLogOut', 
   'customers/CustomerLogOut', 
-  
   async (thunkAPI) => {
       console.log('CustomerLogOut:')
-     
     try {
 
       console.log('loginCustomer setLoginCustomer:')
@@ -131,12 +129,12 @@ export const CustomerLogOut = createAsyncThunk(
                 state.SignIn = false
                 state.errorReg = true
           })
-          .addCase(Customerlogin.pending, (state, action) => {
+          .addCase(custlogin.pending, (state, action) => {
             // When data is being fetched
             //state.SignIn = false
             state.statusLogin = '...انتظار'
           })
-          .addCase(Customerlogin.fulfilled, (state, action) => {
+          .addCase(custlogin.fulfilled, (state, action) => {
             state.SignIn = true
             state.statusLogin = 'تم تسجيل الدخول  بنجاح'
             console.log('action.payload.Email:',action.payload.Email)
@@ -154,7 +152,7 @@ export const CustomerLogOut = createAsyncThunk(
              //navigate("/HomePage", { replace: true });
 
           })
-          .addCase(Customerlogin.rejected, (state, action) => {
+          .addCase(custlogin.rejected, (state, action) => {
            // When data is fetched unsuccessfully
                 state.statusLogin = 'خطأ في تسجيل الدخول، قد يكون رقم تلفونك او ايميلك مسجل من قبل!!'
                 state.SignIn = false

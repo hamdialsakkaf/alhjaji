@@ -13,10 +13,10 @@ function MainPage() {
 
     useEffect(()=> {
         //Axios.get("http://localhost:3002/server/api/get").then((data)=> {
-        Axios.get("https://api.imagemarketing.net/get",{
+        Axios.get("https://api.alhjaji.com/get",{
             mode: 'cors',
             headers: {
-             "Content-Type": "text/html",
+             "Content-Type": "application/json",
          },
            }).then((data)=> {
 

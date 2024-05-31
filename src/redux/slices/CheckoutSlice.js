@@ -49,7 +49,7 @@ export const Customerlogin = createAsyncThunk(
   }
   // الاوصل الصالح مع try
  try { 
-    const res = await axios.post('https://api.imagemarketing.net/Customerlogin', 
+    const res = await axios.post('http://localhost:5000/Customerlogin', 
      //await axios.post('https://api.imagemarketing.net/Customerlogin', 
       user
   )

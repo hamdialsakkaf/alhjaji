@@ -1,175 +1,159 @@
-const express = require("express")
-const cors = require('cors');
+var http = require('http');
+var express = require('express')
+var cors = require('cors')
+const mysql = require('mysql');
+var https = require('https');
+var fs = require('fs');
+const path = require('path')
+var app = express()
+const bodyParser = require('body-parser')
 
-const db = require('./config/db')
-//const dotenv = require("dotenv")
-//dotenv.config()
-// from vedio
-//const config = require("./config/db")
-//const { port, allowedDomains }  = config
-const PORT = process.env.PORT || 5000;
-const bcrypt = require('bcrypt');
-var bodyParser = require('body-parser')
-var path = require("path")
-const app = express()
-// 👇️ configure CORS
-app.use(cors());
-app.use((_req, res, next) => {
+const db = require('./util/database')
+
+const httpServer = http.createServer(app);
+var PORT = process.env.PORT || 5000;
+
+const product = require('./moduls/product')
+const login = require('./moduls/login')
+const Requests = require('./moduls/Requests')
+/*
+var options = {
+    key: fs.readFileSync( './alhjaji.com.key' ),
+    cert: fs.readFileSync( './alhjaji.com.crt' ),
+    requestCert: false,
+    rejectUnauthorized: false
+};
+
+var port = process.env.PORT || 443;
+var server = https.createServer( options, app );
+server.listen( port, function () {
+    console.log( 'Express server listening on port ' + server.address().port );
+} );
+*/
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+
+
+app.use(cors())
+
+
+app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', '*');
+    res.header('methods', 'GET,PUT,POST,DELETE');
+
     next();
   });
-  app.use(cors({
-    origin: '*',    
-}));
-app.use(express.json())
+  
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.static(path.join(__dirname, 'public')))
+//app.disable('x-powered-by');
+app.use(express.json());
 
-/*
-app.use(cors({
-    origin: '*' , 
-    methods: 'GET,PUT,POST,OPTIONS', 
-   'Access-Control-Allow-Origin': '*',
-   'Content-Type': 'application/json',
-  'Cache-Control': 'public'
-
-}));
-
-   app.use(cors({
-    origin: '*'
-}));
-*/
-/*
-const compressing = require('compressing');
-app.use(compressing())
-*/
-app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.urlencoded({ extended: true })); // support url-encoded bodies
-
-app.use(express.static(path.join(__dirname, '/public')));
-/*
-app.get('/*', function (req, res) {
-    //res.sendFile(path.join(__dirname, 'build', 'index.html'));
-    res.sendFile(path.join(__dirname, 'index.html'));
-
-  });
-  */
-  /*
-const PORT = 3000;
-// from vedio
-//app.use(cors({origin: allowedDomains, credentials: true }))
-//app.use(helmet())
-app.use(express.json())
-//app.use(cors({ origin: 'https://alhjaji.com/', credentials: true }));
-//app.use(cors({ origin: process.env.REMOTE_CLIENT_APP, credentials: true }));
-/*
-app.use(cors({
-   // origin: 'https://alhjaji.com/',
-    origin: ['https://alhjaji.com', 'http://alhjaji.com/']
-}));
-*/
- 
-// Middleware Function to authenticate the user
-const auth = (req, res, next) => {
-    console.log(req.body);
-    if(req.body.logged){
-        next();
-        return;
-    }
-    res.send({
-        success: false,
-        message: "Unauthorized Access"
-    });
-}
-
-// Post request handler for the /admin route
-app.post("/admin", auth, (req, res) => {
-    //res.set('Access-Control-Allow-Origin', '*');
-    //res.set('Access-Control-Allow-Headers', '*');
-    res.send({
-        success: true,
-        message: "Successfully Authenticated"
-    });
+    app.get("/",(req, res) => {
+        //res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.header('Content-type', 'text/html');
+return res.end('<h1>Hello, Secure World!</h1>');
+        //console.log('Hellow express')
+    })
+app.get("/H", (req,res) => {
+    res.header("Content-type", 'text/html')
+    return res.end('<h1>Hello, Hamdi</h1>')
 })
 
-// Route to get all posts
-app.get("/api/get", (req, res) => {
-    //res.set('Access-Control-Allow-Origin', '*');
-    //res.set('Access-Control-Allow-Headers', '*');
+
+// Define a GET route
+app.get('/getire', (req, res) => {
+    // res.header('Content-type', 'application/json');
+    const result = product.fetchTires()
+                    .then(([rows, fieldData]) => {
+                        //console.log('result gettire:', rows[0], rows[1])
+                        //res.status(200).json(rows);
+                        res.send(rows)
+                    })
+                    .catch(err => console.log('fetchTires err', err))
+
+});
+// Route to get one tire
+app.get("/getFromTireSize/:tiresize", (req,res)=> {
+       //res.send("<h1>Hello getFromTireSize!</h1>")
+ //const tiresize = req.params.tiresize;
+ const tiresize = req.params.tiresize;
+ console.log(tiresize)
+ const result = product.fetchgetForTireSize(tiresize)
+                        .then(([rows, fieldData]) => {
+                           res.send(rows)
+                      })
+                        .catch(err => console.log('getFromTireSize err', err) )
+
+})
+
+app.post("/addrequest",(req, res) => {
         
-    db.query("SELECT * FROM posts", (err, result) => {
-        if(err) {
-            console.log(err)
-        }
+    const buyer_id = req.body.buyer_id;
+     const buyerShopName = req.body.buyerShopName;
+    const itemNo = req.body.itemNo;
+    const product = req.body.product;
+    const quantity = req.body.q;
 
-    res.send(result)
-    })
-});
+    const emitData = {product:product,buyerShopName:buyerShopName}
+        
 
-// Route to get all tires
-app.get("/api/getire",(req, res) => {
-    //res.set('Access-Control-Allow-Origin', '*');
-    //res.set('Access-Control-Allow-Headers', 'no-cache');
-    //res.set('cache', '*');
-    //res.set('Content-Type', 'application/json');
-    //res.setHeader('Cache-Control', 'public')
-    db.query("SELECT * FROM tires LIMIT 4", (err, result) => {
-        if(err) {
-            console.log(err)
-        }
-       // console.log('result tires',result)
-   // res.send(result)
-    res.send(result)
+     db.query("INSERT INTO buyerrequests (buyer_id,buyerShopName,itemNo,product,quantity) VALUES (?,?,?,?,?)",[buyer_id,buyerShopName,itemNo,product,quantity],
+    (err,result)=> {
+          if(err){
+              result.send(err)
+          }
 
     })
-});
-
-// Route to get one post
-app.get("/api/getFromId/:id", (req,res)=>{
-    //res.set('Access-Control-Allow-Origin', '*');
-    //res.set('Access-Control-Allow-Headers', '*');
-
-    const id = req.params.id;
-    db.query("SELECT * FROM posts WHERE id = ?", id,
-    (err, result) => {
-        if(err) {
-            console.log(err)
-        }
-        res.send(result.json())
-    })
-});
-
-// Route to get one tire
-app.get("/api/getFromTireId/:id", (req,res)=>{
-    //res.set('Access-Control-Allow-Origin', '*');
-   // res.set('Access-Control-Allow-Headers', '*');
-    const id = req.params.id;
-    db.query("SELECT * FROM tires WHERE id = ?", id,
-    (err, result) => {
-        if(err) {
-            console.log(err)
-        }
-        res.send(result)
-    })
-});
-// Route to get one tire
-app.get("/api/getFromTireSize/:tiresize", (req,res)=>{
-   // res.set('Access-Control-Allow-Origin', '*');
-    //res.set('Access-Control-Allow-Headers', '*');
-    const tiresize = req.params.tiresize;
-   db.query("SELECT * FROM tires WHERE TireSize = ?", tiresize,
-   // db.query("SELECT * FROM tires WHERE TireSize = ?", tiresize,
-    (err, result) => {
-        if(err) {
-            console.log(err)
-        }
-   
+        io.emit('newBuerRequest', emitData)
         res.send(result)
 
-       // console.log('Tires on Size:', result)
+ })
+
+
+// Route to get all tires التطبيق
+app.get("/geBatteries",(req, res) => {
+    //res.send("<h1>Hello getire!</h1>")
+      // db.query("SELECT * FROM Aurorabattery LIMIT 4", (err, result) => {
+      db.query("SELECT * FROM Aurorabattery", (err, result) => {
+
+      if(err) {
+          console.log(err)
+      }
+     // console.log('result tires',result)
+ // res.send(result)
+  res.send(result)
+
+  })
+});
+
+// Route to get all BuyerRequests التطبيق
+app.get("/getBuyerRequest",(req, res) => {
+    console.log('getBuyerRequest app' )
+    const result = Requests.getBuyerRequest()
+    .then(([rows]) => {
+        //console.log('result gettire:', rows[0], rows[1])
+        //res.status(200).json(rows);
+        res.send(rows)
     })
-})
+    .catch(err => console.log('getBuyerRequest err', err))
+/*
+      db.query("SELECT * FROM buyerRequests", (err, result) => {
+
+      if(err) {
+          console.log(err)
+      }
+     // console.log('result tires',result)
+ // res.send(result)
+  res.send(result)
+  })
+  */
+});
+
+
 // Route to get Dolar Yemeni
-app.get("/api/getexchangeDolar", (req,res)=>{
+app.get("/getexchangeDolar", (req,res)=>{
     //res.set('Access-Control-Allow-Origin', '*');
     //res.set('Access-Control-Allow-Headers', '*');
    db.query("SELECT DolarexchangeRial FROM exchange",
@@ -180,47 +164,222 @@ app.get("/api/getexchangeDolar", (req,res)=>{
         }
        // console.log('result:',result[0].DolarexchangeRial)
 
-        res.send(result)
+        res.send(result);
 
-    })
-})
-
-// Route to get brand logo
-app.get("/api/getBrandLogo/:BrandName",(req,res)=>{
-    //res.set('Access-Control-Allow-Origin', '*');
-    //res.set('Access-Control-Allow-Headers', '*');
-    const BrandName = req.params.BrandName;
-   db.query("SELECT * FROM brands WHERE BrandName= ?", BrandName,
-   // db.query("SELECT * FROM tires WHERE TireSize = ?", tiresize,
-    (err, resultLogo) => {
-        if(err) {
-            console.log(err)
-        }
-        console.log('BrandName:', resultLogo[0])
-
-        res.send(resultLogo)
-
-    })
-})
+    });
+});
 
 
-// Route for creating the post
-app.post('/api/create',(req, res) => {
-   // res.set('Access-Control-Allow-Origin', '*');
-   // res.set('Access-Control-Allow-Headers', '*');
-    const username = req.body.userName;
-    const title = req.body.title;
-    const text = req.body.text;
-    db.query("INSERT INTO posts (title, post_text, userName) VALUES (?,?,?)",[title,text,username], (err, result)=>{
+    // Route for creating User
+    app.post("/users",  (req, res)=> {
+        const name = req.body.name;
+        const email = req.body.email;
+        const password = req.body.password;
+    db.query("INSERT INTO users (name, email, password) VALUES (?,?,?)",[name,email,password],
+     (err, result)=>{
         if(err){
             console.log(err)
         }
-        console.log(result)
-    })
+        res.status(200).send("registeration successful");
+    });
 });
 
+// Route for creating Kurimi Customer User
+app.post("/kurimiusersReg",  (req, res, next)=>{
+  
+    const SCustID = req.body.SCustID;
+   const CustomerZone = req.body.CustomerZone;
+   const customerName = req.body.customerName;
+   const email = req.body.email;
+   const password = req.body.password;
+   const addressCity = req.body.addressCity;
+   const addressStreet = req.body.addressStreet;
+   const phoneNumber = req.body.phoneNumber;
+      try { 
+        // Code that might throw an error
+                const result =  db.query("INSERT INTO KurimiUsers (SCustID,CustomerName, Email,CustomerZone, password, addressCity,addressStreet,MobileNumber) VALUES (?,?,?,?,?,?,?,?)",[SCustID,customerName,email,CustomerZone,password,addressCity,addressStreet,phoneNumber],
+                (err, result) => {
+               if(err) {
+                     res.status(400);
+                   res.send("Kurimi Error Register!")
+                } else {
+                    
+                   res.status(200).send("registeration Kurimi Customer successful");
+                }
+           
+              }
+                )
+
+} catch (error) { 
+   //next(error); 
+    //return next(new Error('Error registeration Kurimi Customer'));
+      res.status(400);
+    res.send("Kurimi Error Register!")
+} 
+});
+
+
+    // تسجيل دخول لوحة تحكم موقع الويب
+    app.post('/adminlogin', (req, res) => {
+        //res.set('Access-Control-Allow-Origin', '*');
+        //res.set('Access-Control-Allow-Headers', '*');
+            const email = req.body.email;
+            const passowrd = String(req.body.passowrd);
+            const result = login.Adminlogin(email,passowrd)
+            .then(([rows, fieldData]) => {
+                console.log('result adminlogin:', rows[0])
+                //res.status(200).json(rows);
+                res.send(rows)
+               // res.send(rows)
+            })
+
+            /*
+            db.query("SELECT * FROM users WHERE email= ? AND password= ? ",[email ,passowrd] ,
+            (err, result) => {
+                if(err) {
+                   console.log('err',err)
+                res.send(err)  
+                }
+             res.send(result)  
+        })
+        */
+      
+    });
+    
+
+         // تسجيل دخول عملاء التجزئة   
+         app.post('/customerlogin', async (req, res) => {
+            //res.set('Access-Control-Allow-Origin', '*');
+            //res.set('Access-Control-Allow-Headers', '*');
+            
+                const mobileNumber = req.body.mobileNumber;
+                const passowrd = String(req.body.passowrd);
+                console.log('mobileNumber Customerlogin:', req.body )
+
+                const result = login.Customerlogin(mobileNumber,passowrd)
+                .then(([rows, fieldData]) => {
+                    console.log('result Customerlogin:', rows[0])
+                    //res.status(200).json(rows);
+                    res.send(rows[0])
+                   // res.send(rows)
+                })
+                
+                /*
+                db.query("SELECT * FROM KurimiUsers WHERE MobileNumber = ? AND password= ? ",[mobileNumber ,passowrd] ,
+                (err, result) => {
+                    const Cemail = result[0].Email;
+                    if (!Cemail) {
+                          res.status(400);
+                          res.send("Customer Error Login!")
+                    } else {
+                           res.send(result[0])  
+                    }
+                if(err) {
+                        res.status(400);
+                        //res.send("Customer Error Login!")
+                        
+                     } 
+                 
+            })
+            */
+        })
+         
+    
+         // تسجيل دخول بوابة الكريمي    
+   app.post('/kurimiGetwaylogin', async (req, res) => {
+    //app.post('/kurimiGetwaylogin', async basicAuth() => {
+
+        //res.set('Access-Control-Allow-Origin', '*');
+        //res.set('Access-Control-Allow-Headers', '*');
+        /*
+        const authheader = req.headers.authorization
+        console.log('authheader:',authheader)
+                // Create a buffer from the string 
+let bufferObj = Buffer.from(authheader, "base64"); 
+  
+// Encode the Buffer as a utf8 string 
+let decodedString = bufferObj.toString("utf8"); 
+  
+console.log("The decoded string:", decodedString); 
+
+     
+        res.send(decodedString)
+*/
+        /*
+         if (!authheader) {
+        let err = new Error('You are not authenticated!');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+       // return next(err)
+      }
+        const authDecode =  Base64.decode(authheader)
+                console.log('authDecode:',authDecode)
+
+         const user = authDecode[0];
+        const pass = authDecode[1]
+        */
+            // السابق قبل المصادقة Basic
+            //const name = req.body.name;
+           // const passowrd = String(req.body.pass);
+           // db.query("SELECT * FROM paymentGetwayUsers WHERE Username = ? AND Password= ? ",[name ,passowrd] ,
+            db.query("SELECT * FROM paymentGetwayUsers WHERE Username = ? AND Password= ? ",[user ,pass] ,
+
+            (err, result) => {
+              
+    
+            if(err) {
+                    res.status(400);
+                    //res.send("Customer Error Login!")
+                    
+                 } 
+            res.send(result[0])  
+ 
+        })
+        
+    })
+    
+
+        // تسجيل دخول العملاء على التطبيق
+        app.post('/loginBuer', async (req, res) => {
+            //res.set('Access-Control-Allow-Origin', '*');
+            //res.set('Access-Control-Allow-Headers', '*');
+                const email = req.body.email;
+                const passowrd = String(req.body.passowrd);
+                db.query("SELECT * FROM buyers WHERE buyerEmail= ? AND buyerPassord= ? ",[email ,passowrd] ,
+                (err, result) => {
+                    if(err) {
+                       console.log('err',err)
+                    res.send(err)  
+    
+                    }
+                // السابق الصالح
+                 //res.send(result)  
+    
+                 res.send(result[0])  
+            })
+          
+        });
+        
+    
+// اختيار بطاقة الدفع
+app.get("/chooseBankCard",(req, res) => {
+    //res.send("<h1>Hello getire!</h1>")
+       //db.query("SELECT * FROM tires LIMIT 4", (err, result) => {
+      db.query("SELECT * FROM PaymentCards", (err, result) => {
+
+      if(err) {
+          console.log(err)
+      }
+     // console.log('result tires',result)
+ // res.send(result)
+  res.send(result)
+
+  })
+});
+
+
 // Route for creating the tire
-app.post('/api/createtire', (req, res) => {
+app.post("/createtire",(req, res) => {
     //res.set('Access-Control-Allow-Origin', '*');
     //res.set('Access-Control-Allow-Headers', '*');
     const brandname = req.body.brandname;
@@ -232,134 +391,48 @@ app.post('/api/createtire', (req, res) => {
     const Rollingresistance = req.body.Rollingresistance;
     const Wetgripclass = req.body.Wetgripclass;
     const noiseClass = req.body.noiseClass;
-
     const price = req.body.price;
 
-    db.query("INSERT INTO tires (brandname, tiresize, image,Maxload,MaxSpeed,Depthoftread,Rollingresistance,Wetgripclass,noiseClass, price) VALUES (?,?,?,?,?,?,?,?,?,?)",[brandname,tiresize,image,Maxload,MaxSpeed,Depthoftread,Rollingresistance,Wetgripclass,noiseClass,price], (err, result)=>{
+    db.query("INSERT INTO tires (brandname, tiresize, image,Maxload,MaxSpeed,Depthoftread,Rollingresistance,Wetgripclass,noiseClass, price) VALUES (?,?,?,?,?,?,?,?,?,?)",[brandname,tiresize,image,Maxload,MaxSpeed,Depthoftread,Rollingresistance,Wetgripclass,noiseClass,price], 
+    (err, result)=>{
         if(err){
             console.log(err)
+         res.send(err)  
+
         }
-        console.log(result)
+        //console.log(result)
+         res.send(result)  
+
     })
 });
 
 // Route to like a post
-app.post('/api/like/:id',cors(),(req,res)=>{
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Headers', '*');
-    const id = req.params.id;
-    db.query("UPDATE posts SET likes = likes + 1 WHERE id = ?",id, (err,result)=>{
-        if(err) {
-       console.log(err)   } 
-       console.log(result)
-        });    
-    });
+app.post('/like/:id',cors(),(req,res)=>{
+    // res.set('Access-Control-Allow-Origin', '*');
+    // res.set('Access-Control-Allow-Headers', '*');
+     const id = req.params.id;
+     db.query("UPDATE tires SET likes = likes + 1 WHERE id = ?",id, (err,result)=>{
+         if(err) {
+        console.log(err)   } 
+        console.log(result)
+         });    
+     });
+ 
 
-    // Route to delete a post
-    app.delete('/api/delete/:id',cors(), (req,res)=>{
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Access-Control-Allow-Headers', '*');
-    const id = req.params.id;
-    
-    db.query("DELETE FROM posts WHERE id= ?", id, (err,result)=>{
-    if(err) {
-    console.log(err)
-            } 
-        })
-    });
-
-      // Route to delete a post
-      app.delete('/api/deleteTire/:id',cors(),(req,res)=>{
-        const id = req.params.id;
-        
-        db.query("DELETE FROM tires WHERE id= ?", id, (err,result)=>{
-        if(err) {
-        console.log(err)
-                } 
-            })
-        });
-
-    // Route for creating User
-    app.post('/api/users', async (req, res) => {
-       // res.set('Access-Control-Allow-Origin', '*');
-       // res.set('Access-Control-Allow-Headers', '*');
-        const name = req.body.name;
-        const email = req.body.email;
-        const password = req.body.password;
-    db.query("INSERT INTO users (name, email, password) VALUES (?,?,?)",[name,email,password],
-     (err, result)=>{
-        if(err){
-            console.log(err)
-        }
-        res.status(200).send("registeration successful");
-    })
-});
-
-// Route to login Users
-//app.get("/login/:params", (req,res)=>{
-
-
-    app.post('/api/login', async (req, res) => {
+    // Route to get one tire
+    app.get("/getFromTireId/:id", (req,res)=>{
         //res.set('Access-Control-Allow-Origin', '*');
-        //res.set('Access-Control-Allow-Headers', '*');
-            const email = req.body.email;
-            const passowrd = String(req.body.passowrd);
-            console.log('email', email)
-            console.log('passowrd:',passowrd)
-            //db.query("SELECT * FROM users WHERE email= ? AND password= ? ",[email ,passowrd] ,
-
-            // db.query("SELECT * FROM tires WHERE TireSize = ?", tiresize,
-            db.query("SELECT * FROM users WHERE email= ?",email,
-
-            (err, result) => {
-                if(err) {
-                   console.log('err',err)
-
-                }
-                res.send(result)  
-        })
-      
-    })
-    
-   
-/*
-       if (email ) {
-        console.log(email+'='+ emailAuth)
-    }
-    if (passowrd ) {
-        console.log(passowrd+'='+ passowrdAuth)
-        res.send(result)
-    } else {
-        res.send(err)
-    }
-    */
-    //})
-       
-    
-  /*
-    let myPromise = new Promise(function(myResolve, myReject) {
-        let x = 0;
-      
-      // some code (try to change x to 5)
-      if (email = emailAuth) {
-        myResolve("OK");
-      } else {
-          myReject("Error");
-        }
-      });
-      
-      myPromise.then(
-        function(value) {
-            if (passowrd = passowrdAuth) {
-                res.send(reault)
+       // res.set('Access-Control-Allow-Headers', '*');
+        const id = req.params.id;
+        db.query("SELECT * FROM tires WHERE id = ?", id,
+        (err, result) => {
+            if(err) {
+                console.log(err)
             }
-            myDisplayer(value);
-        },
-        function(error) {myDisplayer(error);}
-      );
-  */
-//})
-
+            res.send(result)
+        })
+    });
+     
 
 app.listen(PORT, function(err){
     if (err) console.log("Error in server setup")
