@@ -1,4 +1,3 @@
-var http = require('http');
 var express = require('express')
 var cors = require('cors')
 const mysql = require('mysql');
@@ -10,12 +9,17 @@ const bodyParser = require('body-parser')
 
 const db = require('./util/database')
 
-const httpServer = http.createServer(app);
+//const httpServer = http.createServer(app);
 var PORT = process.env.PORT || 5000;
 
 const product = require('./moduls/product')
 const login = require('./moduls/login')
 const Requests = require('./moduls/Requests')
+const Payment = require('./moduls/Payment')
+const Register = require('./moduls/Register')
+const Gateway = require('./moduls/Gatways')
+const FetchForAndroidApp = require('./moduls/FetchForAndroidApp')
+const Control = require('./moduls/ControlPanel')
 /*
 var options = {
     key: fs.readFileSync( './alhjaji.com.key' ),
@@ -30,10 +34,28 @@ server.listen( port, function () {
     console.log( 'Express server listening on port ' + server.address().port );
 } );
 */
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+const port = 3000;
 
-
+const http = require("http").createServer();
+const io = require("socket.io")(http, {
+    cors: {
+        origin: "http://localhost:3001"
+      }
+});
+//Listen for a client connection 
+io.on("connection", (socket) => {
+    //Socket is a Link to the Client 
+    console.log("New Client is Connected!");
+    //Here the client is connected and we can exchanged 
+    //Send Message 
+    //We need to use the Socket (the link between the server and the connected user(s)).
+    socket.emit("welcome", "Hello and Welcome to the Server");
+});
+//io.emit('connect', 'Hello, World!');
+//Listen the HTTP Server 
+http.listen(port, () => {
+    console.log("Server socket Is Running Port: " + port);
+});
 app.use(cors())
 
 
@@ -98,75 +120,56 @@ app.post("/addrequest",(req, res) => {
 
     const emitData = {product:product,buyerShopName:buyerShopName}
         
+    const result = Requests.addrequest(buyer_id,buyerShopName,itemNo,product,quantity)
+    .then(([rows, fieldData]) => {
+       //res.send(rows)
+       io.emit('newBuerRequest', emitData)
+       res.send(rows)
 
-     db.query("INSERT INTO buyerrequests (buyer_id,buyerShopName,itemNo,product,quantity) VALUES (?,?,?,?,?)",[buyer_id,buyerShopName,itemNo,product,quantity],
-    (err,result)=> {
-          if(err){
-              result.send(err)
-          }
-
-    })
-        io.emit('newBuerRequest', emitData)
-        res.send(result)
+  })
+    .catch(err => console.log('addrequest err', err) )
 
  })
 
 
 // Route to get all tires التطبيق
 app.get("/geBatteries",(req, res) => {
-    //res.send("<h1>Hello getire!</h1>")
-      // db.query("SELECT * FROM Aurorabattery LIMIT 4", (err, result) => {
-      db.query("SELECT * FROM Aurorabattery", (err, result) => {
 
-      if(err) {
-          console.log(err)
-      }
-     // console.log('result tires',result)
- // res.send(result)
-  res.send(result)
-
-  })
+        const result = FetchForAndroidApp.fetchBatteries()
+        .then(([rows]) => {
+            res.send(rows)
+        })
+        .catch(err => {
+            res.status(400)
+            res.send('get Batteries data error')
+            console.log('get Batteries data error', err)
+        })
 });
 
-// Route to get all BuyerRequests التطبيق
+// Route to get all BuyerRequests from  التطبيق
 app.get("/getBuyerRequest",(req, res) => {
     console.log('getBuyerRequest app' )
     const result = Requests.getBuyerRequest()
     .then(([rows]) => {
-        //console.log('result gettire:', rows[0], rows[1])
-        //res.status(200).json(rows);
         res.send(rows)
     })
-    .catch(err => console.log('getBuyerRequest err', err))
-/*
-      db.query("SELECT * FROM buyerRequests", (err, result) => {
+    .catch(err => {
+        res.status(400)
+        res.send('get Buyers Request  error')
+        console.log('get Buyers Request error', err)
+    })
 
-      if(err) {
-          console.log(err)
-      }
-     // console.log('result tires',result)
- // res.send(result)
-  res.send(result)
-  })
-  */
 });
 
 
 // Route to get Dolar Yemeni
 app.get("/getexchangeDolar", (req,res)=>{
-    //res.set('Access-Control-Allow-Origin', '*');
-    //res.set('Access-Control-Allow-Headers', '*');
-   db.query("SELECT DolarexchangeRial FROM exchange",
-   // db.query("SELECT * FROM tires WHERE TireSize = ?", tiresize,
-    (err, result) => {
-        if(err) {
-            console.log(err)
-        }
-       // console.log('result:',result[0].DolarexchangeRial)
+    const result = Payment.getexchangeDolar()
+    .then(([rows]) => {
+        res.send(rows)
+    })
+    .catch(err => console.log('getexchangeDolar err', err))
 
-        res.send(result);
-
-    });
 });
 
 
@@ -175,13 +178,12 @@ app.get("/getexchangeDolar", (req,res)=>{
         const name = req.body.name;
         const email = req.body.email;
         const password = req.body.password;
-    db.query("INSERT INTO users (name, email, password) VALUES (?,?,?)",[name,email,password],
-     (err, result)=>{
-        if(err){
-            console.log(err)
-        }
-        res.status(200).send("registeration successful");
-    });
+        const result = Register.registerUser(name,email,password)
+        .then(([rows]) => {
+            res.send(rows)
+        })
+        .catch(err => console.log('Register users err', err))
+
 });
 
 // Route for creating Kurimi Customer User
@@ -195,63 +197,39 @@ app.post("/kurimiusersReg",  (req, res, next)=>{
    const addressCity = req.body.addressCity;
    const addressStreet = req.body.addressStreet;
    const phoneNumber = req.body.phoneNumber;
-      try { 
-        // Code that might throw an error
-                const result =  db.query("INSERT INTO KurimiUsers (SCustID,CustomerName, Email,CustomerZone, password, addressCity,addressStreet,MobileNumber) VALUES (?,?,?,?,?,?,?,?)",[SCustID,customerName,email,CustomerZone,password,addressCity,addressStreet,phoneNumber],
-                (err, result) => {
-               if(err) {
-                     res.status(400);
-                   res.send("Kurimi Error Register!")
-                } else {
-                    
-                   res.status(200).send("registeration Kurimi Customer successful");
-                }
-           
-              }
-                )
 
-} catch (error) { 
-   //next(error); 
-    //return next(new Error('Error registeration Kurimi Customer'));
-      res.status(400);
+   const result = Gateway.kurimiUserReg(SCustID,customerName,email,CustomerZone,password,addressCity,addressStreet,phoneNumber)
+   .then(([rows]) => {
+    res.send(rows)
+   })
+   .catch(err => {
+    res.status(400);
     res.send("Kurimi Error Register!")
-} 
+    console.log('Register users err', err)
+   })
+
 });
 
 
     // تسجيل دخول لوحة تحكم موقع الويب
     app.post('/adminlogin', (req, res) => {
-        //res.set('Access-Control-Allow-Origin', '*');
-        //res.set('Access-Control-Allow-Headers', '*');
             const email = req.body.email;
             const passowrd = String(req.body.passowrd);
             const result = login.Adminlogin(email,passowrd)
             .then(([rows, fieldData]) => {
                 console.log('result adminlogin:', rows[0])
-                //res.status(200).json(rows);
                 res.send(rows)
-               // res.send(rows)
             })
-
-            /*
-            db.query("SELECT * FROM users WHERE email= ? AND password= ? ",[email ,passowrd] ,
-            (err, result) => {
-                if(err) {
-                   console.log('err',err)
-                res.send(err)  
-                }
-             res.send(result)  
-        })
-        */
-      
-    });
+            .catch(err => {
+                res.status(400);
+                res.send("admin login Error!")
+                console.log('admin login err', err)
+               })
+    })
     
 
          // تسجيل دخول عملاء التجزئة   
          app.post('/customerlogin', async (req, res) => {
-            //res.set('Access-Control-Allow-Origin', '*');
-            //res.set('Access-Control-Allow-Headers', '*');
-            
                 const mobileNumber = req.body.mobileNumber;
                 const passowrd = String(req.body.passowrd);
                 console.log('mobileNumber Customerlogin:', req.body )
@@ -263,25 +241,11 @@ app.post("/kurimiusersReg",  (req, res, next)=>{
                     res.send(rows[0])
                    // res.send(rows)
                 })
-                
-                /*
-                db.query("SELECT * FROM KurimiUsers WHERE MobileNumber = ? AND password= ? ",[mobileNumber ,passowrd] ,
-                (err, result) => {
-                    const Cemail = result[0].Email;
-                    if (!Cemail) {
-                          res.status(400);
-                          res.send("Customer Error Login!")
-                    } else {
-                           res.send(result[0])  
-                    }
-                if(err) {
-                        res.status(400);
-                        //res.send("Customer Error Login!")
-                        
-                     } 
-                 
-            })
-            */
+                .catch(err => {
+                    res.status(400);
+                    res.send("Customer login Error!")
+                    console.log('Customer login err', err)
+                   })
         })
          
     
@@ -345,19 +309,19 @@ console.log("The decoded string:", decodedString);
             //res.set('Access-Control-Allow-Headers', '*');
                 const email = req.body.email;
                 const passowrd = String(req.body.passowrd);
-                db.query("SELECT * FROM buyers WHERE buyerEmail= ? AND buyerPassord= ? ",[email ,passowrd] ,
-                (err, result) => {
-                    if(err) {
-                       console.log('err',err)
-                    res.send(err)  
-    
-                    }
-                // السابق الصالح
-                 //res.send(result)  
-    
-                 res.send(result[0])  
-            })
-          
+                console.log('email server loginBuer:', req.body )
+
+                const result = login.loginBuer(email,passowrd)
+                .then(([rows, fieldData]) => {
+                    //res.status(200).json(rows);
+                    res.send(rows)
+                })
+                .catch(err => {
+                    res.status(400);
+                    res.send("login buyer login Error!")
+                    console.log('Buyer login err', err)
+                   })
+  
         });
         
     
@@ -365,16 +329,16 @@ console.log("The decoded string:", decodedString);
 app.get("/chooseBankCard",(req, res) => {
     //res.send("<h1>Hello getire!</h1>")
        //db.query("SELECT * FROM tires LIMIT 4", (err, result) => {
-      db.query("SELECT * FROM PaymentCards", (err, result) => {
+        const result = Gateway.FetchPaymentCards()
+                        .then(([rows]) => {
+                            res.send(rows)
+                        })
+                        .catch(err => {
+                        res.status(400)
+                        res.send('Choose Bank Card Error')
+                        console.log('Choose Bank Card Error', err)
+                        })
 
-      if(err) {
-          console.log(err)
-      }
-     // console.log('result tires',result)
- // res.send(result)
-  res.send(result)
-
-  })
 });
 
 
@@ -393,16 +357,14 @@ app.post("/createtire",(req, res) => {
     const noiseClass = req.body.noiseClass;
     const price = req.body.price;
 
-    db.query("INSERT INTO tires (brandname, tiresize, image,Maxload,MaxSpeed,Depthoftread,Rollingresistance,Wetgripclass,noiseClass, price) VALUES (?,?,?,?,?,?,?,?,?,?)",[brandname,tiresize,image,Maxload,MaxSpeed,Depthoftread,Rollingresistance,Wetgripclass,noiseClass,price], 
-    (err, result)=>{
-        if(err){
-            console.log(err)
-         res.send(err)  
-
-        }
-        //console.log(result)
-         res.send(result)  
-
+    const result = Control.createTire(brandname,tiresize,image,Maxload,MaxSpeed,Depthoftread,Rollingresistance,Wetgripclass,noiseClass,price)
+    .then(([rows]) => {
+        res.send(rows)
+    })
+    .catch(err => {
+        res.status(400)
+        res.send('Create Tire Error')
+        console.log('Create Tire Error', err)
     })
 });
 

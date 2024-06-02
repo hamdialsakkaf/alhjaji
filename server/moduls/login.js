@@ -7,6 +7,9 @@ function Customerlogin (m,n)  {
 function Adminlogin (email,passowrd)  {
     return db.execute("SELECT * FROM users WHERE email= ? AND password= ? ",[email ,passowrd])
  }
-
-module.exports = { Customerlogin, Adminlogin };
+ function loginBuer (email,passowrd)  {
+   return db.execute("SELECT * FROM buyers WHERE buyerEmail= ? AND buyerPassord= ? ",[email ,passowrd])
+}
+ 
+module.exports = { Customerlogin, Adminlogin, loginBuer };
 

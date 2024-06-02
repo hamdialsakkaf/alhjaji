@@ -17,16 +17,16 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
    
     const [paymentCards, setPaymentCards]= useState([]);
 
-    const getData = async() => {
-     await axios.get('https://api.imagemarketing.net/chooseBankCard',
+    const getData = () => {
+      axios.get('http://localhost:5000/chooseBankCard',
     ).then((data)=>{
         setPaymentCards(data.data)
     })
     }
   
-    useEffect(async()=> {
+    useEffect(()=> {
         console.log('paymentCards:',paymentCards)
-      await getData()
+       getData()
    }, [])
  
     return (

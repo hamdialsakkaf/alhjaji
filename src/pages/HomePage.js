@@ -21,34 +21,50 @@ import '../App.css';
 // Importing toastify module
  
 // Import toastify css file
-import {io} from 'socket.io-client'
+import io from 'socket.io-client';
+
 import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
 //Axios.defaults.baseurl = process.env.react_app_be_url;
   const HomePage = () => {
+    let socket = io("http://localhost:3000");
+    //Now Listen for Events (welcome event).
+    socket.on("welcome", (data) => {
+      /*For the listener we specify the event name and we give the callback to which be called one the 
+      event is emitted*/
+      //Log the Welcome message 
+      console.log("Message: ", data);
+    });
     const navigate = useNavigate();
     const dispatch = useDispatch()
 
     const getCustomerInfo = useSelector((state) => state.CustomerAccount)
     const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
 
-
     const [time, setTime] = useState('fetching')  
   
     useEffect(()=>{
       try {
         console.log('starting socket in client..')
+        /*
         const socket = io('http://localhost:5000', {
           //withCredentials: true,
           extraHeaders: {
             "Access-Control-Allow-Origin": "*"
           }
         })
-        socket.on('connect', ()=>console.log(socket.id))
+        */
+       // io.on('connect', ()=>console.log(socket.id))
+    
         socket.on('connect_error', ()=>{
-          setTimeout(()=>socket.connect(),5000)
+          setTimeout(()=>socket.connect(),3000)
         })
-        
-        socket.on('newBuerRequest', (data)=>setTime(data))
+      
+        //socket.on('newBuerRequest', (data)=>setTime(data))
+        socket.on('newBuerRequest', (data)=>{
+          setTime(data)
+          console.log('setTime:',data);
+
+      })
 
       socket.on('time', (data)=>setTime(data))
       socket.on('disconnect',()=>setTime('server disconnected'))
