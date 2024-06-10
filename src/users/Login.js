@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 //import { useNavigate } from 'react-router-dom'
 import { useParams,useLocation,useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux'
 
 import axios from 'axios';
 //import  Axios  from '../config'
@@ -11,10 +12,14 @@ import Badge from 'react-bootstrap/Badge';
 //import { Link } from 'react-router-dom';
 
 import bcrypt from 'bcryptjs'
-
+import { adminlogin } from '../redux/slices/adminSlice';
 
 function Login() {
     const navigate = useNavigate();
+    const dispatch = useDispatch()
+    const getAdminInfo = useSelector((state) => state.AdminAccount)
+    const { userToken, userInfo, AdminEmail,permissionAdmin } = getAdminInfo
+    
     const [auth, setAuth] = useState(false);
 
     const [email, setEmail] = useState('');
@@ -28,6 +33,13 @@ function Login() {
     const hashedPassword = bcrypt.hashSync(password, '$2a$10$CwTycUXWue0Thq9StjUM0u') // hash created previously created upon sign up
 
     const globalVariable = 0;
+    useEffect(()=> {
+        if (userToken) {
+            navigate('/AdminPage')
+        } else {
+            navigate('/login')
+        }
+    }, [])
 
     useEffect(()=>{
         if(localStorage.getItem("login")){
@@ -41,9 +53,52 @@ function Login() {
         }
     },[auth])
 
+    /*
+    useEffect(() => {
+       
+        // Sign in request
+        axios.post("http://localhost:5000/adminlogin", { email: email, password: password })
+         .then((response) => {
+          console.log("Sign in successful", response.data);
+          // Store the authentication token for subsequent requests
+          const token = response.data.token;
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+         })
+         .catch((error) => {
+          console.error("Sign in error", error);
+         });
+        // Test request
+        /*
+        axios.get("/test")
+         .then((response) => {
+          console.log("Test request successful", response.data);
+         })
+         .catch((error) => {
+          console.error("Test request error", error);
+         });
+         
+       }, []);
+*/
+
+const loginAdmin = async (e) => {
+    e.preventDefault();
+    const user = {
+        email: email,
+        passowrd: hashedPassword
+         }
+  
+        try {
+            dispatch(adminlogin(user))
+
+        } catch (error) {
+
+            setMsg('حصل خطأ اثناء تسجيل الدخول ')
+        }
+    
+}
     const submitAuth = async (e) => {
         e.preventDefault();
-        try {
+        
            // Axios.get(`http://localhost:3002/login/${email}`).then((data)=>{
             setLoading(true);
             const user = {
@@ -51,11 +106,48 @@ function Login() {
                 passowrd: hashedPassword
             }
             //await axios.post('https://api.agtco.info/api/login', 
-            await axios.post('http://localhost:5000/adminlogin', 
-                user
+
+            // Sign in request
+            //axios.post("http://localhost:5000/adminlogin", { username: "exampleuser", password: "password123" })
+            /*
+            axios.post("http://localhost:5000/adminlogin", { email, password })
+            .then((response) => {
+                console.log("Sign in successful", response.data);
+                // Store the authentication token for subsequent requests
+                const token = response.data.token;
+                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+                })
+                .catch((error) => {
+                console.error("Sign in error", error);
+                //navigate('/Login', { replace: true })
+                //setMsg(error);
+                });
+             */
+                await axios.post('http://localhost:5000/adminlogin', 
+                    user,
+                    ).then((res)=> {
+                        setMsg('تم تسجيل المستخدم بنجاح');
+                        console.log("Sign in successful", res.data[0]);
+                       // alert('تم التسجيل بنجاح')
+                    }).catch((err) =>{
+                        setMsg('خطأ في تسجيل المستخدم')
+                    })
+
+           // axios.post('http://localhost:5000/adminlogin', user, 
+              //  { headers }
+        
+                
+                //Adding token to the request
+              
+                // السابق الصالح
+            //await axios.post('http://localhost:5000/adminlogin', 
+                   // user
+            /*
             ).then((data)=>{
-                setPermissions(data.data[0].Permissions)
-                console.log('permissions:', permissions)
+                console.log('permissions:', data.data[0])
+
+               // setPermissions(data.data[0].Permissions)
+                console.log('permissions:', data.data[0])
                if(hashedPassword === data.data[0].password) {
                 if(permissions === "admin") {
                         localStorage.setItem("login", 'true');
@@ -78,15 +170,11 @@ function Login() {
                     }
               
              })
-           
-        } catch (error) {
-            //navigate("/Login")
-            //history.push("/Login")
-            navigate('/Login', { replace: true })
-                setMsg(error.data.data);
-        }
+           */
+    
+        
     }
-
+ 
     return (
         <div className="MainPage">
         <div className='PostContainer'>
@@ -96,7 +184,8 @@ function Login() {
         <Form>
                          <h4>
                             <Badge bg="secondary">{msg}</Badge>
-
+                            <h4>{userToken}</h4>
+                            <h4>{userInfo}</h4>
                              </h4>
                                 <Form.Group className="mb-3" controlId="formGridAddress1">
                                         <FloatingLabel
@@ -123,6 +212,9 @@ function Login() {
                                     </Form.Group>
                                 <Button variant="primary" type="button"  onClick={submitAuth}>
                                         دخول
+                                    </Button>
+                                    <Button variant="primary" type="button"  onClick={loginAdmin}>
+                                    loginAdminDispatch
                                     </Button>
                         </Form>
                                     </div>

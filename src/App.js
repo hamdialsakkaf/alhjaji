@@ -22,6 +22,7 @@ import Register from './users/Register';
 import Login from './users/Login';
 import CustomerLogin from './users/CustomerLogin';
 import AdminPage from './pages/Admin';
+import CusomerRequests from "./pages/CustomersRequests";
 import KuraimiRegister from './users/KuraimiRegUser';
 import { CustomerLogOut,Customerlogin } from './redux/slices/CustomersSlice';
 import CreatePost from './pages/CreatePost';

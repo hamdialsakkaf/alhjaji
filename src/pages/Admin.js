@@ -34,7 +34,9 @@ const AdminPage = () => {
    // Get the gtTires from the store
    const getbuyerRequestsState = useSelector((state) => state.buyerRequests)
    const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
- 
+   const getAdminInfo = useSelector((state) => state.AdminAccount)
+   const { userToken, userInfo, AdminEmail,permissionAdmin } = getAdminInfo
+   
 console.log('buyerRequests:', buyerRequests)
 //console.log(' buyerRequests.stateRequest:',  buyerRequests.stateRequest)
 const [ buyerShopName,setBuyerShopName  ] = useState('')
@@ -45,7 +47,7 @@ let [stateRequest, setStateRequest] = useState('')
 
 
   const navigate = useNavigate();
-
+ 
   const bounce = cssTransition({
     collapse: true,
     enter: "animate__animated animate__bounceIn",
@@ -166,6 +168,7 @@ const handlePagination = (pageNumber) => {
     setLogin(login);
   }, [login]);
 
+ 
   // Click Handler updates the login state
   // when the button is clicked
   const click = () => {
@@ -185,24 +188,25 @@ const handlePagination = (pageNumber) => {
              <Row>
              <Col>
              <Stack direction="horizontal" gap={2}>
-          <Button as="a" href="/createpost" variant="primary">
-              createpost
+        
+          <Button as="a"  href="/CusomerRequests" variant="success">
+            طلبات العملاء
           </Button>
-          <Button as="a"  href="/CreateTire" variant="success">
-            CreateTire
+          <Button as="a"  href="/" variant="success">
+            الشاشة الرئيسية 
           </Button>
         </Stack>;
         <Container fluid="md" className="container">      
       <Stack  gap={1} className="container mx-auto">
       <Form.Text muted className="text-center">
       <h4>
-      أهلاً بك في شركة الحجاجي للتجارة العامة - أجتكو 
-      </h4>
-      <h4>اختر مقاس اطار سيارتك من القائمة ادناه لتحصل على تفاصيل أكثر 
+              أهلا بك في لوحة التحكم
       </h4>
       </Form.Text>
       <div>
     <h1></h1>
+    <h4>{userToken}</h4>
+    <h4>{AdminEmail}</h4>
     </div>
     </Stack>
   
@@ -212,13 +216,23 @@ const handlePagination = (pageNumber) => {
                 <h5>{statusBR}</h5>
                 <h5>{errorGt}</h5>
                 <h4>
-                    طلب جديد من:  
+                   
                 </h4>
-                <h4>{newBuerRequest}
+                <h4>{}
                 </h4>
+
+              
                 </Form.Text>
-               {
-                 buyerRequests.map((val)=>{
+               
+                  <Button as="a"  href="/CusomerRequests" variant="success">
+            طلبات العملاء
+          </Button>
+          <Button as="a"  href="/" variant="success">
+            الشاشة الرئيسية 
+          </Button>
+          <Badge>token : {userToken}</Badge>
+          {
+               userToken ? (  buyerRequests.map((val)=>{
                  // setBuyerShopName(val.buyerShopName)  
                   //setStateRequest(val.stateRequest)
                 
@@ -304,7 +318,8 @@ const handlePagination = (pageNumber) => {
                </Col>            
       
                    )
-                })              
+                })  
+              ) : null            
                }
                </Row>
              

@@ -25,11 +25,17 @@ const initialState = {
     'buyerRequests/getBuyerRequest',
     // async (thunkAPI) => {
       async (thunkAPI) => {
-
+        
     try {
-      console.log('getBuyerRequests Slic',)
+      const getAdminInfo = useSelector((state) => state.AdminAccount)
+const { userToken, userInfo, AdminEmail,permissionAdmin } = getAdminInfo
+
+      console.log('getBuyerRequests Slic')
+      console.log('getBuyerRequests Slic userToken:',userToken)
+
       const res = await axios.get('http://localhost:5000/getBuyerRequest')
-      
+      axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+
       console.log('buyerRequests:', res.data)
       return res.data
     } catch (error) {

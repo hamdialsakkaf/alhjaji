@@ -6,8 +6,8 @@ var fs = require('fs');
 const path = require('path')
 var app = express()
 const bodyParser = require('body-parser')
-
 const db = require('./util/database')
+var jwt = require('jsonwebtoken');
 
 //const httpServer = http.createServer(app);
 var PORT = process.env.PORT || 5000;
@@ -20,6 +20,7 @@ const Register = require('./moduls/Register')
 const Gateway = require('./moduls/Gatways')
 const FetchForAndroidApp = require('./moduls/FetchForAndroidApp')
 const Control = require('./moduls/ControlPanel')
+const requireAuth = require('./moduls/requireAuths')
 /*
 var options = {
     key: fs.readFileSync( './alhjaji.com.key' ),
@@ -58,15 +59,16 @@ http.listen(port, () => {
 });
 app.use(cors())
 
-
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('methods', 'GET,PUT,POST,DELETE');
-
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+    );
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
   });
-  
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 //app.disable('x-powered-by');
@@ -149,6 +151,16 @@ app.get("/geBatteries",(req, res) => {
 // Route to get all BuyerRequests from  التطبيق
 app.get("/getBuyerRequest",(req, res) => {
     console.log('getBuyerRequest app' )
+
+    jwt.verify(req.token,'c045acda77617205441ef', (err)=>{
+        if(err)
+            res.sendStatus(403);
+        else{
+            console.log('jwt.verify req.token',req.token)
+        }
+    })
+
+    
     const result = Requests.getBuyerRequest()
     .then(([rows]) => {
         res.send(rows)
@@ -175,11 +187,14 @@ app.get("/getexchangeDolar", (req,res)=>{
 
     // Route for creating User
     app.post("/users",  (req, res)=> {
+        
         const name = req.body.name;
         const email = req.body.email;
-        const password = req.body.password;
+        const password = req.body.passowrd;
         const result = Register.registerUser(name,email,password)
         .then(([rows]) => {
+           
+        
             res.send(rows)
         })
         .catch(err => console.log('Register users err', err))
@@ -209,22 +224,79 @@ app.post("/kurimiusersReg",  (req, res, next)=>{
    })
 
 });
-
-
     // تسجيل دخول لوحة تحكم موقع الويب
-    app.post('/adminlogin', (req, res) => {
+    app.post('/adminlogin',(req, res) => {
+         //const JWT_SECRET = process.env.JWT_SECRET;
+         console.log('adminlogin posting')
+         const JWT_SECRET = 'c045acda77617205441ef';
+         
             const email = req.body.email;
             const passowrd = String(req.body.passowrd);
-            const result = login.Adminlogin(email,passowrd)
-            .then(([rows, fieldData]) => {
-                console.log('result adminlogin:', rows[0])
-                res.send(rows)
+            console.log('adminlogin email',email)
+            console.log('adminlogin passowrd',passowrd)
+
+                const user = {
+                    userEmail:email,
+                    passowrd:passowrd
+                }
+               
+                const result = login.Adminlogin(email,passowrd)
+                .then(([rows, fieldData]) => {
+                    console.log('email for token', rows[0].email)
+                    const em = rows[0].email
+                    const token = jwt.sign({em}, JWT_SECRET);
+
+                    //return res
+                   // res.status(200)
+                   // .json({ message: "User Logged in Successfully", token })
+                    res.send(token)
+
+                      //Mock user
+                //res.send({token: token, rows})
+                // السابق الصالح قبل token
+                //res.send(rows)
             })
+            
+
+                
+                 /* 
+                .then(()=>{
+                    const result = login.Adminlogin(email,passowrd)
+                    .then(([rows, fieldData]) => {
+                        console.log('email for token', rows[0].email)
+                      
+                          //Mock user
+                    //res.send({token: token, rows})
+                    // السابق الصالح قبل token
+                   // res.send(rows)
+                })
+                })
+      
+                const result = login.Adminlogin(email,passowrd)
+                .then(([rows, fieldData]) => {
+                    console.log('email for token', rows[0].email)
+                    jwt.verify(req.token,'c045acda77617205441ef', (err, authData)=>{
+                        if(err)
+                            res.sendStatus(403);
+                        else{
+                            res.send({
+                                rows:rows,
+                                userData:authData
+                            })
+                        }
+                    })
+                      //Mock user
+                //res.send({token: token, rows})
+                // السابق الصالح قبل token
+                //res.send(rows)
+            })
+            *//*
             .catch(err => {
                 res.status(400);
                 res.send("admin login Error!")
                 console.log('admin login err', err)
                })
+               */
     })
     
 

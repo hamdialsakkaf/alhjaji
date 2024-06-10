@@ -7,10 +7,14 @@ import { combineReducers } from "redux";
 import { thunk } from "redux-thunk";
 import buyerRequestsSlice from './slices/getBuyerRequestSlice';
 import CustomerAccountSlice from "./slices/CustomersSlice";
+import AdminAccountSlice from "./slices/adminSlice";
+
 const reducers = combineReducers({
     buyerRequests: buyerRequestsSlice,
     //KurimiRegister: KurimiSlice,
     CustomerAccount: CustomerAccountSlice,
+    AdminAccount: AdminAccountSlice
+
 
 });
 
