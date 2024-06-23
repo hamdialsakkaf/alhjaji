@@ -27,17 +27,14 @@ import "react-toastify/dist/ReactToastify.css";
 
 //import { getGtItems } from "../redux/slices/gtSlice";
 //import { getBuyerRequests, setInprogressRequset } from "../redux/slices/getBuyerRequestSlice";
-import { getBuyerRequests } from "../redux/slices/getBuyerRequestSlice";
+import { AdminLogOut } from "../redux/slices/adminSlice";
 
 const AdminPage = () => {
   const dispatch = useDispatch()
    // Get the gtTires from the store
-   const getbuyerRequestsState = useSelector((state) => state.buyerRequests)
-   const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
    const getAdminInfo = useSelector((state) => state.AdminAccount)
-   const { userToken, userInfo, AdminEmail,permissionAdmin } = getAdminInfo
-   
-console.log('buyerRequests:', buyerRequests)
+   const { userToken, userInfo,AdminEmail, SignInAdmin,statusAdminLogin,permissionAdmin } = getAdminInfo
+  
 //console.log(' buyerRequests.stateRequest:',  buyerRequests.stateRequest)
 const [ buyerShopName,setBuyerShopName  ] = useState('')
 const [ requestid,setRequestid  ] = useState('')
@@ -48,6 +45,18 @@ let [stateRequest, setStateRequest] = useState('')
 
   const navigate = useNavigate();
  
+  useEffect(()=>{
+    if (SignInAdmin) {
+      console.log('SignInAdmin yes:', SignInAdmin)
+      navigate("/AdminPage", { replace: true });
+    } else {
+      console.log('SignInAdmin no:', SignInAdmin)
+      navigate("/adminLogin", { replace: true });
+    }
+  
+  },[SignInAdmin])
+
+  
   const bounce = cssTransition({
     collapse: true,
     enter: "animate__animated animate__bounceIn",
@@ -123,8 +132,8 @@ let [stateRequest, setStateRequest] = useState('')
       console.log('Socket error Client:',error)
     }
   
-
 },[])
+
 
 const handlePagination = (pageNumber) => {
   setCurrentPage(pageNumber);
@@ -136,54 +145,41 @@ const handlePagination = (pageNumber) => {
     buyerShopName:buyerShopName
   }
 
-
-     useEffect(() => {
-      // eslint-disable-next-line no-unused-vars
-      let isMounted = true
-  
-      // If status is 'idle', then fetch the posts data from the API
-      if (statusBR === 'idle') {
-        dispatch(getBuyerRequests())
-      }
-      // Cleanup function
-      return () => {
-        isMounted = false
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [statusBR, dispatch])
-
+   
 
  // const [username, setUsername] = useLocalStorage("name", "");
 
 
-  const [login, setLogin] = useLocalStorage("login", "false");
-  console.log('login getLogin:', login)
+  //const [login, setLogin] = useLocalStorage("login", "false");
+  //console.log('login getLogin:', login)
 
   // Updating the local storage whenever 
   // the login state changes
+  /* السابق قبل التوكن
   useEffect(() => {
     console.log('Login state effect:', login)
     //localStorage.setItem("login", JSON.stringify(login));
     //localStorage.setItem("login", login);
     setLogin(login);
   }, [login]);
-
+*/
  
   // Click Handler updates the login state
   // when the button is clicked
   const click = () => {
-    setLogin((prev) => {
-      console.log('login prev:', prev)
+   // setLogin((prev) => {
+      console.log('dispatch AdminLogOut:')
+      dispatch(AdminLogOut())
 
-      return !prev;
-    });
+     // return !prev;
+    //})
   }
- 
+
 	return(
     <Container >
         <ToastContainer />
             {
-        login ? (
+        SignInAdmin ? (
              //children 
              <Row>
              <Col>
@@ -206,134 +202,23 @@ const handlePagination = (pageNumber) => {
       <div>
     <h1></h1>
     <h4>{userToken}</h4>
-    <h4>{AdminEmail}</h4>
+    <h4>{statusAdminLogin}</h4>
     </div>
-    </Stack>
-  
-      <Container>
-        <Row>
-              <Form.Text muted className="text-center">
-                <h5>{statusBR}</h5>
-                <h5>{errorGt}</h5>
-                <h4>
-                   
-                </h4>
-                <h4>{}
-                </h4>
-
-              
-                </Form.Text>
-               
-                  <Button as="a"  href="/CusomerRequests" variant="success">
-            طلبات العملاء
-          </Button>
-          <Button as="a"  href="/" variant="success">
-            الشاشة الرئيسية 
-          </Button>
-          <Badge>token : {userToken}</Badge>
-          {
-               userToken ? (  buyerRequests.map((val)=>{
-                 // setBuyerShopName(val.buyerShopName)  
-                  //setStateRequest(val.stateRequest)
-                
-                  //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
-                  const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.buyer_id+ ' المقاس:'+ val.q 
-                  + 'والمسعر بقيمة:'+ val.product  + 'دولار'
-                  return(
-                  <Col sm={4} xs="auto">
-                 
-                    <Badge bg="warning" text="dark">
-                    {val.buyer_id }
-                  
-                     </Badge>
-                <Card  key={val.id } bg="primary" sm={4}>
-                <Card.Header>
-                <Nav variant="pills" defaultActiveKey="#first">
-                    <Nav.Item>
-                      <Nav.Link  href="#link" onClick={()=>(navigate(`/tire/${val.id}`))}>مواصفات</Nav.Link>
-                    </Nav.Item>
-                  
-                    <Nav.Item>
-                      <Nav.Link href="#disabled" disabled>
-                        Disabled
-                      </Nav.Link>
-                    </Nav.Item>
-                  </Nav>
-             </Card.Header>
-                  <Card.Body>
-                    <Card.Title><Badge bg="warning" text="dark">
-                طلب شراء   
-                     </Badge>
-                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.buyer_id}`))}>{val.buyer_id}  {val.buyerShopName}</h1>   
-                      
-                     </Card.Title>
-                    <Card.Text>
-                  
-                    <h3>
-                     <Badge bg="secondary">{val.product} </Badge> 
-                </h3>
-                    </Card.Text>
-                  </Card.Body>
-                  <ListGroup variant="flush" bg="danger">
-                 
-                  <ListGroup.Item>
-                  <div className="vr" />
-                   <h5>
-             
-                </h5></ListGroup.Item>
-                <div> </div> 
-                </ListGroup>
-                <div> </div> 
-                <Button as="a" variant="danger" size="lg" href={url} target='_blank'>
-                       شراء
-                    </Button>
-                    <Badge bg="secondary">{val.product} </Badge> 
-              
-                <Table striped bordered hover variant="dark" responsive>
-                    <thead>
-                   
-                      <tr>
-                        <th> العميل </th>
-                        <th>رقم الصنف</th>
-                        <th> الكمية</th>
-                        <th> حالةالطلب</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>{val.buyer_id}</td>
-                        <td>{val.itemNo}</td>
-                        <td>{val.quantity}</td>
-                        <td>قيد التحقق</td>
-                        <td><Button  variant="danger" size="sm" >
-                       قيد التنفيذ
-                    </Button>
-
-                      </td>
-                      </tr>
-                    </tbody>
-                  </Table>
-                </Card>
-               </Col>            
-      
-                   )
-                })  
-              ) : null            
-               }
-               </Row>
-             
-           </Container>            
+    </Stack>         
 
 </Container>
 
         <Badge bg="danger" as={Button} onClick={
           () => click()
-          } >{login ? "Logout" : "Login"} </Badge >
+          } >{SignInAdmin ? "الخروج" : "الدخول"} </Badge >
+
            </Col>
          </Row>
           ) : 
-          navigate("/Login")
+          
+        <Badge bg="danger" as={Button}> hfhffh</Badge >
+
+         // navigate("/Login")
          //history.push("/Login")
          //navigate('/Login', { replace: true })
         }

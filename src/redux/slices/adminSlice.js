@@ -4,13 +4,14 @@ import bcrypt from 'bcryptjs'
 
 //const url = 'https://jsonplaceholder.typicode.com/posts'
 // initialize userToken from local storage
+/*
 const userToken = localStorage.getItem('userToken')
   ? localStorage.getItem('userToken')
   : null
-
+*/
 const initialState = {
   userInfo: null,
-  userToken,
+  userToken: null,
   success: false,
     email:null,
     //CustomerEmail:null,
@@ -64,8 +65,8 @@ const initialState = {
     )
 
     // Get all the getLogin from the API
-export const adminlogin = createAsyncThunk(
-  'auth/adminlogin', 
+export const adminlogins = createAsyncThunk(
+  'auth/adminlogins', 
   async (userdata,{rejectWithValue }) => {
   console.log('getLogin userdata:', userdata['email'] + userdata['passowrd'])
   const user = {
@@ -73,41 +74,77 @@ export const adminlogin = createAsyncThunk(
     passowrd: userdata['passowrd'] 
   }
   // الاوصل الصالح مع try
- try { 
     // configure header's Content-Type as JSON
     const config = {
       headers: {
         'Content-Type': 'application/json',
-      },
+      }
     }
+    //axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    try {
+      const response = await axios
+      .post("http://localhost:5000/adminlogins", 
+       //await axios.post('https://api.imagemarketing.net/Customerlogin', 
+        user,
+        config,
+        { withCredentials: true }
+    )
+    console.log('Authenticated successfully:', response.data);
+      return response.data
+    
 
-    const res = await axios.post('http://localhost:5000/adminlogin', 
-     //await axios.post('https://api.imagemarketing.net/Customerlogin', 
-      user,
-      config
-  )
-
-  // Store the authentication token for subsequent requests
-  const token = res.data;
-    // store user's token in local storage
-    localStorage.setItem('userToken', res.data)
-    console.log("Sign in successful", res.data);
-  //console.log(" res client token", token);
-
-  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
- return res.data
- //return res
-
-} catch (error) {
-    // return custom error message from backend if present
+    } catch (error) {
       if (error.response && error.response.data.message) {
         return rejectWithValue(error.response.data.message)
       } else {
         return rejectWithValue(error.message)
       }
     }
+     /*
+       axios
+       .post("http://localhost:5000/adminlogins", 
+        //await axios.post('https://api.imagemarketing.net/Customerlogin', 
+         user,
+         config,
+         { withCredentials: true }
+     ).then(response => {
+       console.log('Authenticated successfully:', response.data);
+       return response.data
+     }).catch(err => {
+      console.log('adminlogins err:', err)
+     })
+    */
+    })
   
-})
+    
+     //Access the Set-Cookie header from the response
+    //const setCookieHeader = response.headers['auth_token'];
+    
+   // const setCookieHeader = instance.headers['set-cookie'];
+
+    // You can now store the cookie or use it for subsequent requests
+    //console.log('Cookie received:', setCookieHeader);
+// السابق الصالح
+ /*
+    const res = await axios.post('http://localhost:5000/adminlogin', 
+     //await axios.post('https://api.imagemarketing.net/Customerlogin', 
+      user,
+      config
+  ).then(response => {
+    console.log('Authenticated successfully:', response.data);
+  })
+*/
+  // Store the authentication token for subsequent requests
+ // const token = res.data;
+    // store user's token in local storage
+   // localStorage.setItem('userToken', res.data)
+   // console.log("Sign in successful", res.data);
+  //console.log(" res client token", token);
+
+  //axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+ //return res.data
+ //return res
+
 
 export const AdminLogOut = createAsyncThunk(
  // 'kurimi/CustomerLogOut', 
@@ -157,36 +194,48 @@ export const AdminLogOut = createAsyncThunk(
                state.loading = false
                state.error = payload
          })
-          .addCase(adminlogin.pending, (state, action) => {
+          .addCase(adminlogins.pending, (state, action) => {
             // When data is being fetched
             //state.SignIn = false
             state.statusAdminLogin = '...انتظار'
           })
           //.addCase(adminlogin.fulfilled, (state, action) => {
-            .addCase(adminlogin.fulfilled, (state, action) => {
-
+            .addCase(adminlogins.fulfilled, (state, { payload } ) => {
             state.SignInAdmin = true
             state.statusAdminLogin = 'تم تسجيل الدخول  بنجاح'
-            console.log('action.payload.token:',action.payload)
+            console.log('action.payload.token:', payload.auth_token)
            // state.userToken = action.payload
-            state.userInfo = action.payload
-            state.userToken = action.payload
-            //localStorage.setItem("customerlogin", 'true');
-            //setAuth(true);
-             //navigate("/HomePage", { replace: true });
-
+            state.userInfo = payload.auth_token
+            state.userToken = payload.auth_token
           })
-          .addCase(adminlogin.rejected, (state, action) => {
+          .addCase(adminlogins.rejected, (state, action) => {
            // When data is fetched unsuccessfully
                 state.statusAdminLogin = 'خطأ في تسجيل الدخول، قد يكون رقم تلفونك او ايميلك مسجل من قبل!!'
                 state.SignInAdmin = false
                 state.errorAdminLogin = true
                 state.userToken = null
-                //localStorage.setItem("persist:root", 'false');
-                //setAuth(true);
-                 //navigate("/customerlogin");
           })
-          
+
+          .addCase(AdminLogOut.pending, (state, action) => {
+            // When data is being fetched
+            //state.SignIn = false
+            state.statusAdminLogin = '...انتظار'
+          })
+          //.addCase(adminlogin.fulfilled, (state, action) => {
+            .addCase(AdminLogOut.fulfilled, (state, { payload } ) => {
+            state.SignInAdmin = false
+            state.statusAdminLogin = 'تم تسجيل الخروج  بنجاح'
+            state.userToken = null
+            state.userInfo = null
+        
+          })
+          .addCase(AdminLogOut.rejected, (state, action) => {
+           // When data is fetched unsuccessfully
+                state.statusAdminLogin = ' تم تسجيل الخروج'
+                state.SignInAdmin = false
+                state.errorAdminLogin = true
+                state.userToken = null
+          })
           // and provide a default case if no other handlers matched
           .addDefaultCase((state, action) => {})
       },

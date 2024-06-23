@@ -1,23 +1,50 @@
-module.exports = (req, res, next) => {
-    // Extracting JWT secret from environment variable
-     const JWT_SECRET = process.env.JWT_SECRET;
-     //Extracting token from authorization header
-     const { authorization } = req.headers;
-    // Checking if authorization header is present
-     //authorization === 'Bearer "token"'
-     if (!authorization) {
-      return res.status(404).send({ error: "Must be logged in" });
-     }
-    
-    // Removing 'Bearer ' prefix to get the token
-     const token = authorization.replace("Bearer ", "c045acda77617205441ef");
-     //Verifying if the token is valid.
-     jwt.verify(token, JWT_SECRET, async (err, payload) => {
-      if (err) {
-       return res.status(403).send("Could not verify token");
-      }
-     // Adding user information to the request object
-      req.user = payload;
-     });
-     next();
-    };
+const jwt = require('jsonwebtoken');
+
+function verifyAdminToken(req, res, next) {
+  // token for buyers login for requests توكن لعملاء الجملة لطلبات الشراء
+  //const token = req.headers.authorization
+  const token = req.headers.authorization.split(' ')[1]
+
+    console.log('req.headers authorization',req.headers.authorization)
+    console.log('req.headers authorization split:',req.headers.authorization.split(' ')[1])
+  if (!token) {
+    console.log('No token provided')
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  jwt.verify(token, 'c045acda77617205441ef7', (err, decoded) => {
+    if (err) {
+        console.log('Failed to authenticate token')
+      return res.status(403).json({ message: 'Failed to authenticate token' });
+    }
+    console.log('authenticated token')
+    req.email = decoded.email;
+    next();
+  });
+}
+
+function verifyCustomerToken(req, res, next) {
+  // توكن لعملاء التجزئة
+  //const token = req.headers.authorization
+  const token = req.headers.authorization.split(' ')[1]
+
+    console.log('req.headers verifyCustomerToken authorization',req.headers.authorization)
+    console.log('req.headers verifyCustomerToken authorization split:',req.headers.authorization.split(' ')[1])
+  if (!token) {
+    console.log('No token verifyCustomerToken provided')
+    return res.status(401).json({ message: 'No token verifyCustomerToken provided' });
+  }
+
+  jwt.verify(token, 'c045acda77617205441ef8', (err, decoded) => {
+    if (err) {
+        console.log('Failed to authenticate Admin token')
+      return res.status(403).json({ message: 'Failed to authenticate Admin token' });
+    }
+    console.log('authenticated token')
+    req.email = decoded.email;
+    next();
+  });
+}
+
+module.exports = {verifyAdminToken, verifyCustomerToken};
+//module.exports = verifyToken;

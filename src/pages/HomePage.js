@@ -38,8 +38,12 @@ import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
     const dispatch = useDispatch()
 
     const getCustomerInfo = useSelector((state) => state.CustomerAccount)
-    const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
+    const { SignIn, statusLogin,CustomerToken, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
 
+    const getAdminInfo = useSelector((state) => state.AdminAccount)
+    const { userToken, userInfo, SignInAdmin,statusAdminLogin,permissionAdmin } = getAdminInfo
+    
+    console.log('homepage CustomerToken..',CustomerToken)
     const [time, setTime] = useState('fetching')  
   
     useEffect(()=>{
@@ -90,36 +94,24 @@ import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
 
 
     //console.log(' loginCustomer:', loginCustomer)
-  
+ 
     // Updating the local storage whenever 
     // the login state changes
-    /*
-    useEffect(() => {
-      console.log('loginCustomer state :', loginCustomer)
-      //localStorage.setItem("login", JSON.stringify(login));
-      //localStorage.setItem("login", login);
-      setLoginCustomer(SignIn);
-    }, [SignIn]);
-  */
+    
+ 
     // Click Handler updates the login state
     // when the button is clicked
- /*
+ 
     useEffect(()=>{
-      if(localStorage.getItem("loginCustomerStorage")){
-          const loginCustomerStorage = JSON.parse(localStorage.getItem("loginCustomerStorage"))
-          console.log('login loginCustomerStorage:', loginCustomerStorage)
-          //setAuthCustomer(loginCustomerStorage);
-           //return login;
-      }
-      /*
-      if(authCustomer) {
-         navigate('/HomePage')
+      
+      if(SignIn) {
+         navigate('/')
       } else {
           navigate('/customerlogin')
       }
       
-  },[SignIn])
-  */
+  },[])
+  
 
   /*
       Axios.get("https://api.alhjaji.com/get",{
@@ -134,20 +126,27 @@ import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
         })
   */
     
-    const getData = () => {
+        const user = {
+          userToken : userToken
+        }
+
+    const getData = async () => {
+      const headers = { 'Authorization': `Bearer ${CustomerToken}` };
+      
       try {
-        axios.get("http://localhost:5000/getire",{
-        
-         }).then((res)=> {
+        axios.get("http://localhost:5000/getire",{headers})
+        .then((res)=> {
           setTireList(res.data)
           //console.log('responseData:',res.data)
 
       })
+  
       } catch (error) {
         // Handle error
         console.error(error);
       }
-    };
+      
+    }
 
     const fitchTiresFromTireSize = (size) => {
       try {
@@ -208,6 +207,7 @@ let handleTireSizeChange = (e) => {
       </h4>
       </Form.Text>
       {time}
+      {userToken}
       <div>
     <h1></h1>
     </div>

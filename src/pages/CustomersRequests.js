@@ -1,329 +1,307 @@
-import React, { useState, useEffect} from "react";
+import React,{useState,useEffect } from 'react'
+//import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux'
+import { useParams,useLocation,useNavigate,Navigate } from "react-router-dom";
 
-//import { useNavigate } from 'react-router-dom';
-import { useParams,useLocation,useNavigate    } from "react-router-dom";
-
-import useLocalStorage from "use-local-storage";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { Stack } from "react-bootstrap";
-import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Nav from 'react-bootstrap/Nav';
-import Toast from 'react-bootstrap/Toast';
-import {io} from 'socket.io-client'
+import Stack from 'react-bootstrap/Stack';
+import { FloatingLabel } from 'react-bootstrap';
 
+import '../App.css';
 // Importing toastify module
-import { Bounce,Slide,toast,ToastContainer,cssTransition } from "react-toastify";
  
 // Import toastify css file
-import "react-toastify/dist/ReactToastify.css";
+import io from 'socket.io-client';
 
-//import { getGtItems } from "../redux/slices/gtSlice";
-//import { getBuyerRequests, setInprogressRequset } from "../redux/slices/getBuyerRequestSlice";
-import { getBuyerRequests } from "../redux/slices/getBuyerRequestSlice";
-
-const CusomerRequests = () => {
-  const dispatch = useDispatch()
-   // Get the gtTires from the store
-   const getbuyerRequestsState = useSelector((state) => state.buyerRequests)
-   const { buyerRequests, statusBR, errorGt } = getbuyerRequestsState
- 
-console.log('buyerRequests:', buyerRequests)
-//console.log(' buyerRequests.stateRequest:',  buyerRequests.stateRequest)
-const [ buyerShopName,setBuyerShopName  ] = useState('')
-const [ requestid,setRequestid  ] = useState('')
-let [stateRequest, setStateRequest] = useState('')
-
-  const [currentPage, setCurrentPage] = useState(1);
-
-
-  const navigate = useNavigate();
-
-  const bounce = cssTransition({
-    collapse: true,
-    enter: "animate__animated animate__bounceIn",
-    //exit: "animate__animated animate__bounceOut"
-  });
-  function animateCss() {
-    toast.success("مرحباً 👋, وصل طلب جديد!", {  
-      transition: bounce,
-      autoClose:false,
-      icon: "🚀"
-
+import { CustomerLogOut,Customerlogin } from '../redux/slices/CustomersSlice';
+//Axios.defaults.baseurl = process.env.react_app_be_url;
+  const CusomerRequests = () => {
+    let socket = io("http://localhost:3000");
+    //Now Listen for Events (welcome event).
+    socket.on("welcome", (data) => {
+      /*For the listener we specify the event name and we give the callback to which be called one the 
+      event is emitted*/
+      //Log the Welcome message 
+      console.log("Message: ", data);
     });
-  }
+    const navigate = useNavigate();
+    const dispatch = useDispatch()
 
-  const [newBuerRequest, setNewBuerRequest] = useState('اعلامات الطلبات الجديدة') 
-  const [newbuyerShopName, setNewbuyerShopName] = useState('') 
+    const getCustomerInfo = useSelector((state) => state.CustomerAccount)
+    const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
 
-  
-  const Msg = () => (
-    <Form.Text muted className="text-center">
-    <h4>
-    {newbuyerShopName}
-    </h4>
-    <h4>
-    {newBuerRequest}
-    </h4>
-    </Form.Text>
-
-  );
-
-
-
-  const notify = () => {
-    toast.info(<Msg />,{
-      autoClose: false,
-      icon: "👍"
-    });
-  };
-
-  //const notify = () => toast(<Msg />, { 
-   //const notify = () =>animateCss()
-
-  useEffect(() => {
-    dispatch(notify)
-
-  }, [newBuerRequest])
-
-  
-  useEffect(()=>{
-    try {
-      console.log('starting socket in client..')
-      const socket = io('http://localhost:5000', {
-        //withCredentials: true,
-        extraHeaders: {
-          "Access-Control-Allow-Origin": "*"
-        }
-      })
-      socket.on('connect', ()=>console.log(socket.id))
-      socket.on('connect_error', ()=>{
-        setTimeout(()=>socket.connect(),5000)
-      })
-      socket.on('newBuerRequest', (data)=>{
-        console.log('newBuerRequest', data.product)
-        console.log('data.buyerShopName', data.buyerShopName)
-
-        setNewBuerRequest(data.product)
-        setNewbuyerShopName(data.buyerShopName)
-
-      })
-
-      console.log('newBuerRequest:', newBuerRequest)
-    } catch (error) {
-      console.log('Socket error Client:',error)
-    }
-  
-
-},[])
-
-const handlePagination = (pageNumber) => {
-  setCurrentPage(pageNumber);
-};
-
+    const getAdminInfo = useSelector((state) => state.AdminAccount)
+    const { userToken, userInfo, SignInAdmin,statusAdminLogin,permissionAdmin } = getAdminInfo
     
-  const reqDetaile = {
-    requestid: requestid,
-    buyerShopName:buyerShopName
-  }
-
-
-     useEffect(() => {
-      // eslint-disable-next-line no-unused-vars
-      let isMounted = true
+    console.log('homepage userToken..',userToken)
+    const [time, setTime] = useState('fetching')  
   
-      // If status is 'idle', then fetch the posts data from the API
-      if (statusBR === 'idle') {
-        dispatch(getBuyerRequests())
+    useEffect(()=>{
+      try {
+        console.log('starting socket in client..')
+        /*
+        const socket = io('http://localhost:5000', {
+          //withCredentials: true,
+          extraHeaders: {
+            "Access-Control-Allow-Origin": "*"
+          }
+        })
+        */
+       // io.on('connect', ()=>console.log(socket.id))
+    
+        socket.on('connect_error', ()=>{
+          setTimeout(()=>socket.connect(),3000)
+        })
+      
+        //socket.on('newBuerRequest', (data)=>setTime(data))
+        socket.on('newBuerRequest', (data)=>{
+          setTime(data)
+          console.log('setTime:',data);
+
+      })
+
+      socket.on('time', (data)=>setTime(data))
+      socket.on('disconnect',()=>setTime('server disconnected'))
+      } catch (error) {
+        console.log('Socket error Client:',error)
       }
-      // Cleanup function
-      return () => {
-        isMounted = false
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [statusBR, dispatch])
+    
+  
+  },[])
+
+//function HomePage() {
+  //const [error, setError] = useState(null);
+  const [error] = useState(null);
+    let [tire, setTire] = useState("⬇️ Select a tire ⬇️")
+    let [tiresize, setTireSize] = useState("⬇️ Select a tire Size ⬇️")
+    //let [tireList, setTireList]=useState([]);
+    let [requestsList, setRequestsList]=useState([]);
+
+    let [tiresOnSize, setTireOnSize] = useState([])
+    let [DolarexchangeRial, setDolarexchangeRial] = useState()
+    let [productprice, setProductPrice] = useState()
+    let [productrialprice, setProductRialPrice] = useState(productprice * DolarexchangeRial)
+    //let [tirelogo, setTireLogo] = useState("")
+    //const hankkokLogo = "https://logonoid.com/images/hankook-logo.png"
 
 
- // const [username, setUsername] = useLocalStorage("name", "");
-
-
-  const [login, setLogin] = useLocalStorage("login", "false");
-  console.log('login getLogin:', login)
-
-  // Updating the local storage whenever 
-  // the login state changes
-  useEffect(() => {
-    console.log('Login state effect:', login)
-    //localStorage.setItem("login", JSON.stringify(login));
-    //localStorage.setItem("login", login);
-    setLogin(login);
-  }, [login]);
-
-  // Click Handler updates the login state
-  // when the button is clicked
-  const click = () => {
-    setLogin((prev) => {
-      console.log('login prev:', prev)
-
-      return !prev;
-    });
-  }
+    //console.log(' loginCustomer:', loginCustomer)
  
-	return(
-    <Container >
-        <ToastContainer />
-            {
-        login ? (
-             //children 
-             <Row>
-             <Col>
-             <Stack direction="horizontal" gap={2}>
-          <Button as="a" href="/createpost" variant="primary">
-              createpost
-          </Button>
-          <Button as="a"  href="/CreateTire" variant="success">
-            CreateTire
-          </Button>
-        </Stack>;
-        <Container fluid="md" className="container">      
+    // Updating the local storage whenever 
+    // the login state changes
+    
+ 
+    // Click Handler updates the login state
+    // when the button is clicked
+ 
+    useEffect(()=>{
+      if(!SignInAdmin) {
+          navigate('/adminlogin')
+      }
+      
+  },[SignInAdmin])
+  
+
+  /*
+      Axios.get("https://api.alhjaji.com/get",{
+            mode: 'cors',
+            headers: {
+             "Content-Type": "application/json",
+         },
+           }).then((data)=> {
+
+       
+            setPostList(data.data)
+        })
+  */
+    
+        const user = {
+          userToken : userToken
+        }
+
+    const getData = async () => {
+      const headers = { 'Authorization': `Bearer ${userToken}` };
+      
+      try {
+        axios.get("http://localhost:5000/getBuyerRequests",{headers})
+        .then((res)=> {
+          setRequestsList(res.data)
+          //console.log('responseData:',res.data)
+
+      })
+  
+      } catch (error) {
+        // Handle error
+        console.error(error);
+      }
+      
+    }
+/*
+    const fitchTiresFromTireSize = (size) => {
+      try {
+        axios.get(`http://localhost:5000/getFromTireSize/${size}`,{
+        
+         }).then((res)=> {
+          setTireOnSize(res.data)
+          console.log('setTireOnSize:',res.data)
+
+      })
+      } catch (error) {
+        // Handle error
+        console.error('fitchTiresFromTireSize error',error);
+      }
+    }
+*/
+  
+    useEffect(()=> {
+       getData()
+   }, [])
+        /*
+      window.addEventListener("beforeunload", (event)=> {
+        getData()
+      })
+      */
+      window.addEventListener("load", (event) => {
+        getData()
+      })
+  //}
+  /*
+        useEffect(()=>{
+          fitchTiresFromTireSize(tiresize)
+          },[tiresize])
+        */
+        const yemeniRials = ()=> {
+          axios.get(`http://localhost:5000/getexchangeDolar`).then((data)=>{
+            setDolarexchangeRial(data.data[0].DolarexchangeRial);
+            setProductRialPrice(productprice * DolarexchangeRial)
+         })
+        }
+
+    // whenever a new option is selected from the dropdown
+    /*
+let handleTireSizeChange = (e) => {
+  setTireSize(e.target.value)
+  //console.log('tire Change:', tire)
+}
+*/
+    return (
+      <div>
+      <Container fluid="md" className="container">      
       <Stack  gap={1} className="container mx-auto">
+    
+      
       <Form.Text muted className="text-center">
       <h4>
-      أهلاً بك في شركة الحجاجي للتجارة العامة - أجتكو 
+    شاشة طلبات العملاء الواردة
       </h4>
-      <h4>اختر مقاس اطار سيارتك من القائمة ادناه لتحصل على تفاصيل أكثر 
-      </h4>
+      
       </Form.Text>
+      {time}
+      {userToken}
       <div>
     <h1></h1>
     </div>
     </Stack>
-  
-      <Container>
-        <Row>
-              <Form.Text muted className="text-center">
-                <h5>{statusBR}</h5>
-                <h5>{errorGt}</h5>
-                <h4>
-                    طلب جديد من:  
-                </h4>
-                <h4>{newBuerRequest}
-                </h4>
-                </Form.Text>
-               {
-                 buyerRequests.map((val)=>{
-                 // setBuyerShopName(val.buyerShopName)  
-                  //setStateRequest(val.stateRequest)
                 
-                  //const url ='https://web.whatsapp.com/send?phone=967775955150&text='
-                  const url ='https://wa.me/967775955150?text='+' من فضلك احتاج شراء اطار ماركة' +val.buyer_id+ ' المقاس:'+ val.q 
-                  + 'والمسعر بقيمة:'+ val.product  + 'دولار'
-                  return(
-                  <Col sm={4} xs="auto">
-                 
-                    <Badge bg="warning" text="dark">
-                    {val.buyer_id }
-                  
-                     </Badge>
-                <Card  key={val.id } bg="primary" sm={4}>
+               <div>
+               <h4>
+              <Badge bg="danger"  > الطلبات الأخيرة:</Badge >
+              <ListGroup.Item>{DolarexchangeRial} سعر الصرف</ListGroup.Item>
+
+              </h4>
+               </div>
+           <Container>
+            <Row>
+                <h4>
+                   <Badge bg="danger"  > {error}</Badge >
+                   </h4>
+           {//tireList.map((val)=>{
+             // Array.isArray(tireList) ?
+             requestsList.map((val)=>{
+                  const {buyer_id, buyerShopName, itemNo, product,quantity} = val;
+
+                 //  const url ='https://web.whatsapp.com/send?phone=967775955150&text='
+                  // + ' من فضلك احتاج شراء اطار ماركة' +val.brandname+ ' المقاس:'+ val.tiresize 
+                   const url ='https://wa.me/967775955150?text='+' من فضلك اهتم بطلب   العميل' +buyerShopName+ ' وطلب هذه البضاعة:'+ product 
+                   + ' والكمية:'+ quantity  
+            return (
+             <Col sm={4} xs="auto">
+              <Card 
+              key={buyer_id} 
+              sm={4}
+                bg="primary"
+                text='white'
+              // border="warning" 
+              >
                 <Card.Header>
-                <Nav variant="pills" defaultActiveKey="#first">
-                    <Nav.Item>
-                      <Nav.Link  href="#link" onClick={()=>(navigate(`/tire/${val.id}`))}>مواصفات</Nav.Link>
-                    </Nav.Item>
-                  
-                    <Nav.Item>
-                      <Nav.Link href="#disabled" disabled>
-                        Disabled
-                      </Nav.Link>
-                    </Nav.Item>
-                  </Nav>
              </Card.Header>
                   <Card.Body>
                     <Card.Title><Badge bg="warning" text="dark">
-                طلب شراء   
+                    العميل: {buyerShopName } 
                      </Badge>
-                     <h1 className="post-title" onClick={()=>(navigate(`/tire/${val.buyer_id}`))}>{val.buyer_id}  {val.buyerShopName}</h1>   
-                      
                      </Card.Title>
+
                     <Card.Text>
-                  
+                    {buyerShopName}
                     <h3>
-                     <Badge bg="secondary">{val.product} </Badge> 
-                </h3>
+                     <Badge bg="secondary">{itemNo} رقم الصنف:</Badge> 
+                     <Badge bg="secondary">{product} المنتج:</Badge> 
+                   </h3>
                     </Card.Text>
+                    <Button as="a" variant="primary" href={url} target='_blank'>تحويل </Button>
                   </Card.Body>
-                  <ListGroup variant="flush" bg="danger">
-                 
-                  <ListGroup.Item>
-                  <div className="vr" />
-                   <h5>
-             
-                </h5></ListGroup.Item>
-                <div> </div> 
-                </ListGroup>
-                <div> </div> 
-                <Button as="a" variant="danger" size="lg" href={url} target='_blank'>
+                  <ListGroup variant="flush">
+                     <h4>
+                     <Badge bg="danger" as={Button} > 0</Badge >Likes:
+                     </h4>
+                  <ListGroup.Item> 
+               </ListGroup.Item>
+                  <Button as="a" variant="danger" size="lg" href={url} target='_blank'>
                        شراء
                     </Button>
-                    <Badge bg="secondary">{val.product} </Badge> 
-              
-                <Table striped bordered hover variant="dark" responsive>
+                </ListGroup>
+                  <Table striped bordered hover variant="dark" responsive>
                     <thead>
                    
                       <tr>
-                        <th> العميل </th>
-                        <th>رقم الصنف</th>
-                        <th> الكمية</th>
-                        <th> حالةالطلب</th>
-                        <th></th>
+                        <th>اقصى حمولة</th>
+                        <th> اقصى سرعة</th>
+                        <th>عمق الدعسة</th>
+                        <th>تصنيف التدحرج</th>
+                        <th>تصنيف القبضة الرطبة</th>
+                        <th>تصنيف الضجيج </th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td>{val.buyer_id}</td>
-                        <td>{val.itemNo}</td>
-                        <td>{val.quantity}</td>
-                        <td>قيد التحقق</td>
-                        <td><Button  variant="danger" size="sm" >
-                       قيد التنفيذ
-                    </Button>
-
-                      </td>
+                        <td></td>
+                        <td></td>
+                   
                       </tr>
                     </tbody>
                   </Table>
                 </Card>
-               </Col>            
-      
-                   )
-                })              
-               }
-               </Row>
-             
-           </Container>            
+              </Col>
+              ) })
+               // : null
+
+              } 
+              </Row>
+         </Container>            
 
 </Container>
-
-        <Badge bg="danger" as={Button} onClick={
-          () => click()
-          } >{login ? "Logout" : "Login"} </Badge >
-           </Col>
-         </Row>
-          ) : 
-          navigate("/Login")
-         //history.push("/Login")
-         //navigate('/Login', { replace: true })
-        }
-       </Container> 
-        )
+</div>
+    )
   }
 
 export default CusomerRequests;

@@ -1,16 +1,23 @@
 import React from 'react'
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux'
 //import  Axios  from '../config'
 
 const Navbar = () => {
     //const history = useNavigate();
- 
+   
     const Logout = async () => {
+        /* القديم الصالح
         if(localStorage.getItem("login")){
             const login = JSON.parse(localStorage.setItem("login",false))
             console.log('logOut:', login)
            // setAuth(login);
              return login;
+        }
+        */
+        if (login) {
+            setAuth(login);
+
+            return login;
         }
             }
 /*

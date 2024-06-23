@@ -1,27 +1,18 @@
+var jwt = require('jsonwebtoken');
+
 module.exports = (req, res, next) => {
     // Extracting JWT secret from environment variable
      //const JWT_SECRET = process.env.JWT_SECRET;
-     const JWT_SECRET = 'c045acda77617205441ef';
-
-     
-     //Extracting token from authorization header
-     const { authorization } = req.headers;
-    // Checking if authorization header is present
-     //authorization === 'Bearer "token"'
-     if (!authorization) {
-      return res.status(404).send({ error: "Must be logged in" });
+     const JWT_SECRET = 'c045acda77617205441ef2';
+     var token = req.signedCookies;
+     token = token['Authorization'];
+     try {
+        const verified = jwt.verify(token,JWT_SECRET);
+        req.email=verified;
+        return next()
+     } catch (err) {
+        console.log('error token verify',err)
      }
-    
-    // Removing 'Bearer ' prefix to get the token
-     const token = authorization.replace("Bearer ", "");
-     //Verifying if the token is valid.
-     jwt.verify(token, JWT_SECRET, async (err, payload) => {
-      if (err) {
-       return res.status(403).send("Could not verify token");
-      }
-     // Adding user information to the request object
-      req.user = payload;
-     });
-     next();
+
     }
 

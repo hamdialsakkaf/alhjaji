@@ -22,7 +22,7 @@ function CustomerLogin() {
     const dispatch = useDispatch()
 
     const getCustomerInfo = useSelector((state) => state.CustomerAccount)
-    const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
+    const { SignIn, statusLogin,CustomerToken, errorLogin,CustomerEmail,phoneNumber } = getCustomerInfo
     //const { SignIn, statusLogin, errorLogin } = getSignIn
 
     console.log('getSignIn SignIn:',SignIn)
@@ -51,12 +51,13 @@ function CustomerLogin() {
     })
     */
     useEffect(()=>{
-      
-        if(SignIn) {
-           navigate('/')
-        } else {
-            navigate("/Customerlogin")
+        if (SignIn == true) {
+            navigate('/')
         }
+         if(SignIn == false) {
+            navigate("/customerlogin")
+         }
+         
     },[SignIn])
 
 /*
@@ -141,8 +142,11 @@ useEffect(()=>{
             
         <Form>
                          <h4>
-                            <Badge bg="secondary">{msg}</Badge>
+                            <Badge bg="secondary">statusLogin:{statusLogin}</Badge>
+                            <Badge bg="secondary">SignIn:{SignIn}</Badge>
+                            <Badge bg="secondary">auth_CustomerToken:{CustomerToken}</Badge>
 
+                            
                              </h4>
                                 <Form.Group className="mb-3" controlId="formGridAddress1">
                                         <FloatingLabel

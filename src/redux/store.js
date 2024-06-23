@@ -5,12 +5,12 @@ import storage from 'redux-persist/lib/storage'; // Choose your storage engine
 import { persistReducer } from 'redux-persist';
 import { combineReducers } from "redux";
 import { thunk } from "redux-thunk";
-import buyerRequestsSlice from './slices/getBuyerRequestSlice';
+import buyerRequestsSlice from "./slices/getBuyerRequestSlice";
 import CustomerAccountSlice from "./slices/CustomersSlice";
 import AdminAccountSlice from "./slices/adminSlice";
 
 const reducers = combineReducers({
-    buyerRequests: buyerRequestsSlice,
+  RequestsFromBuersApp: buyerRequestsSlice,
     //KurimiRegister: KurimiSlice,
     CustomerAccount: CustomerAccountSlice,
     AdminAccount: AdminAccountSlice

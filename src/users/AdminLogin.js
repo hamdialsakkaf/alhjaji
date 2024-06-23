@@ -12,13 +12,13 @@ import Badge from 'react-bootstrap/Badge';
 //import { Link } from 'react-router-dom';
 
 import bcrypt from 'bcryptjs'
-import { adminlogin } from '../redux/slices/adminSlice';
+import { adminlogins } from '../redux/slices/adminSlice';
 
-function Login() {
+function AdminLogin() {
     const navigate = useNavigate();
     const dispatch = useDispatch()
     const getAdminInfo = useSelector((state) => state.AdminAccount)
-    const { userToken, userInfo, AdminEmail,permissionAdmin } = getAdminInfo
+    const { userToken, userInfo, SignInAdmin,statusAdminLogin,permissionAdmin } = getAdminInfo
     
     const [auth, setAuth] = useState(false);
 
@@ -32,15 +32,7 @@ function Login() {
     
     const hashedPassword = bcrypt.hashSync(password, '$2a$10$CwTycUXWue0Thq9StjUM0u') // hash created previously created upon sign up
 
-    const globalVariable = 0;
-    useEffect(()=> {
-        if (userToken) {
-            navigate('/AdminPage')
-        } else {
-            navigate('/login')
-        }
-    }, [])
-
+/*
     useEffect(()=>{
         if(localStorage.getItem("login")){
             const login = JSON.parse(localStorage.getItem("login"))
@@ -52,6 +44,18 @@ function Login() {
            navigate('/AdminPage')
         }
     },[auth])
+*/
+
+useEffect(()=>{
+    if (SignInAdmin) {
+      console.log('adminLogin auth yes:', SignInAdmin)
+      navigate("/AdminPage", { replace: true });
+    } else {
+      console.log('adminLogin auth no:', SignInAdmin)
+      navigate("/adminLogin", { replace: true });
+    }
+  
+  },[SignInAdmin])
 
     /*
     useEffect(() => {
@@ -79,19 +83,19 @@ function Login() {
          
        }, []);
 */
-
+const user = {
+    email: email,
+    passowrd: hashedPassword
+     }
 const loginAdmin = async (e) => {
     e.preventDefault();
-    const user = {
-        email: email,
-        passowrd: hashedPassword
-         }
+ 
   
         try {
-            dispatch(adminlogin(user))
+            dispatch(adminlogins(user))
 
         } catch (error) {
-
+            console.log(' dispatch(adminlogins error:',error)
             setMsg('حصل خطأ اثناء تسجيل الدخول ')
         }
     
@@ -178,15 +182,13 @@ const loginAdmin = async (e) => {
     return (
         <div className="MainPage">
         <div className='PostContainer'>
-            <div>
-            <Link to="/customerLogin">Customer Login</Link>
-            </div>
+          
         <Form>
-                         <h4>
-                            <Badge bg="secondary">{msg}</Badge>
-                            <h4>{userToken}</h4>
-                            <h4>{userInfo}</h4>
-                             </h4>
+                            <Badge bg="secondary">msg:{msg}</Badge>
+                            <Badge bg="secondary">userToken:{userToken}</Badge>
+                            <Badge bg="secondary">userInfo:{userInfo}</Badge>
+                            <Badge bg="secondary">statusAdminLogin:{statusAdminLogin}</Badge>
+
                                 <Form.Group className="mb-3" controlId="formGridAddress1">
                                         <FloatingLabel
                                             controlId="floatingInput"
@@ -222,4 +224,4 @@ const loginAdmin = async (e) => {
     )
  }
  
-export default Login
+export default AdminLogin

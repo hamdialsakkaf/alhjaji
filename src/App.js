@@ -19,12 +19,13 @@ import Stack from 'react-bootstrap/Stack';
 import './App.css';
 import HomePage from './pages/HomePage';
 import Register from './users/Register';
-import Login from './users/Login';
+import AdminLogin from "./users/AdminLogin";
 import CustomerLogin from './users/CustomerLogin';
 import AdminPage from './pages/Admin';
 import CusomerRequests from "./pages/CustomersRequests";
 import KuraimiRegister from './users/KuraimiRegUser';
 import { CustomerLogOut,Customerlogin } from './redux/slices/CustomersSlice';
+import { AdminLogOut } from "./redux/slices/adminSlice";
 import CreatePost from './pages/CreatePost';
 import Post from './pages/Post'
 import CreateTire from './pages/CreateTire';
@@ -40,13 +41,20 @@ const App =()=>  {
   const getCustomerInfo = useSelector((state) => state.CustomerAccount)
   const { SignIn, statusLogin, errorLogin,CustomerEmail,phoneNumber,SCustID,CustomerId } = getCustomerInfo
 
+  const getAdminInfo = useSelector((state) => state.AdminAccount)
+  const { userToken, userInfo,AdminEmail, SignInAdmin,statusAdminLogin,permissionAdmin } = getAdminInfo
+ 
 const handleLogout = () => {
   dispatch(CustomerLogOut());
 };
-
+const handleAdminLogout = () => {
+  dispatch(AdminLogOut());
+};
   return (
     // (
-      SignIn ?
+      //SignIn ?  السابق الصالح قبل التوكن
+    
+      SignIn ? (
     <Container container-fluid data-bs-theme="dark" dir="rtl" fluid="md" className='container'>
       <Row >
         <Col >
@@ -114,7 +122,7 @@ const handleLogout = () => {
         <Route path='/checkout/:price' element={<Checkout />}></Route>
 
         <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/adminLogin" element={<AdminLogin />} />
         <Route path="/CustomerLogin" element={<CustomerLogin />} />
        
          <Route  
@@ -125,8 +133,7 @@ const handleLogout = () => {
          path="/kurimiRegister" 
          element={<KuraimiRegister />} 
          />
- 
-
+  <Route path="/CusomerRequests" element={<CusomerRequests />} />
         <Route path="/createpost" element={<CreatePost />} />
         <Route path="/CreateTire" element={<CreateTire />} />
         <Route path="/post/:postId" element={<Post />}/>
@@ -140,7 +147,9 @@ const handleLogout = () => {
 </Row>
 
   </Container>
+      )
   : 
+  (SignIn == false) && (SignInAdmin == false) ? (
 
    <Container container-fluid data-bs-theme="dark" dir="rtl" fluid="md" className='container'>
    <Row >
@@ -159,7 +168,7 @@ const handleLogout = () => {
        <Nav.Link href="/">الرئيسية</Nav.Link>
        <NavDropdown title="المستخدم" id="basic-nav-dropdown">
          <NavDropdown.Item href="/register">مستخدم جديد</NavDropdown.Item>
-         <NavDropdown.Item href="/login">
+         <NavDropdown.Item href="/adminLogin">
            تسجيل الدخول
          </NavDropdown.Item>
          <NavDropdown.Item href="/CustomerLogin">دخول العملاء</NavDropdown.Item>
@@ -181,8 +190,6 @@ const handleLogout = () => {
        </Button>
          </div>
      </div>
-
-
  </Stack>
 </Col>
  </Row>
@@ -210,7 +217,7 @@ const handleLogout = () => {
      <Route path='/checkout/:price' element={<Checkout />}></Route>
 
      <Route path="/register" element={<Register />} />
-     <Route path="/login" element={<Login />} />
+     <Route path="/adminLogin" element={<AdminLogin />} />
      <Route path="/Customerlogin" element={<CustomerLogin />} />
     
       <Route  
@@ -221,8 +228,7 @@ const handleLogout = () => {
       path="/kurimiRegister" 
       element={<KuraimiRegister />} 
       />
-
-
+  <Route path="/CusomerRequests" element={<CusomerRequests />} />
      <Route path="/createpost" element={<CreatePost />} />
      <Route path="/CreateTire" element={<CreateTire />} />
      <Route path="/post/:postId" element={<Post />}/>
@@ -230,11 +236,105 @@ const handleLogout = () => {
      <Route path="*" element={<HomePage />} />
 </Routes>
 </Row>
-
 <Row>
 
 </Row>
 </Container>
+  ) :
+  SignInAdmin  ? (
+    <Container container-fluid data-bs-theme="dark" dir="rtl" fluid="md" className='container'>
+    <Row >
+      <Col >
+      <Stack gap={1} className="container col-md-12 mx-auto">
+      <img src='/LOGO-300.jpg' alt='الحجاجي للتجارة'  height='200%' />
+      </Stack>
+      </Col>
+        </Row>
+ <Navbar expand="lg" className="bg-body-tertiary">
+  <Container>
+    <Navbar.Brand href="#home">الإدارة </Navbar.Brand>
+    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+    <Navbar.Collapse id="basic-navbar-nav">
+      <Nav className="me-auto">
+        <Nav.Link href="/">الرئيسية</Nav.Link>
+        <NavDropdown title="تسجيل الدخول" id="basic-nav-dropdown">           
+          <NavDropdown.Item href="/adminLogin"
+          >
+             <Button onClick={handleAdminLogout}>تسجيل الخروج</Button>
+             تسجيل الخروج</NavDropdown.Item>
+          <NavDropdown.Divider />
+       
+        </NavDropdown>
+      </Nav>
+    </Navbar.Collapse>
+  </Container>
+</Navbar>
+<Row >
+  <Col>
+    <Stack  gap={1} className="container col-md-7 mx-auto">
+
+      <div>
+        <Badge>اهلا, {statusAdminLogin}!</Badge>
+       
+        <Badge>{SignInAdmin}</Badge>
+        <Button onClick={handleAdminLogout}>تسجيل الخروج</Button>
+      </div>
+
+  </Stack>
+</Col>
+  </Row>
+  <Row>
+  <Routes>
+  <Route 
+    // if you're not server rendering, this manages the
+    // initial loading state
+   fallbackElement={<HomePage />}
+    // any rendering or async loading and mutation errors will
+    // automatically be caught and render here, no more error
+    // state tracking or render branching
+    exceptionElement={<HomePage />}
+  >    </Route>
+
+        <Route
+          path="/"
+          element={<HomePage />}
+        />
+
+      <Route path="checkout" element={<Checkout />}>
+        <Route path=":price/product/:tiresize" element={<Checkout />}/>
+      </Route>
+
+      <Route path='/checkout/:price' element={<Checkout />}></Route>
+
+      <Route path="/register" element={<Register />} />
+      <Route path="/adminLogin" element={<AdminLogin />} />
+      <Route path="/CustomerLogin" element={<CustomerLogin />} />
+     
+       <Route  
+       path="/AdminPage" 
+       element={<AdminPage />} 
+       />
+       <Route  
+       path="/kurimiRegister" 
+       element={<KuraimiRegister />} 
+       />
+<Route path="/CusomerRequests" element={<CusomerRequests />} />
+      <Route path="/createpost" element={<CreatePost />} />
+      <Route path="/CreateTire" element={<CreateTire />} />
+      <Route path="/post/:postId" element={<Post />}/>
+      <Route path="/tire/:tireId" element={<Tire />}/>
+      <Route path="*" element={<HomePage />} />
+</Routes>
+</Row>
+
+<Row>
+
+</Row>
+
+</Container>
+  )
+   : null
+
 )
 //}
 

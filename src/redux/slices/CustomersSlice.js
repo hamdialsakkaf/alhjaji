@@ -4,13 +4,15 @@ import axios from 'axios'
 //const url = 'https://jsonplaceholder.typicode.com/posts'
 
 const initialState = {
+  SignIn: false,
+  CustomerToken:null,
     email:null,
     CustomerEmail:null,
     SCustID: null,
     CustomerId: null,
     CustomerZone: null,
     permission: null,
-    SignIn: false,
+  
     statusLogin: 'idle',
     statusReg: 'idle',
     errorReg: false,
@@ -59,26 +61,37 @@ export const custlogin = createAsyncThunk(
   'login/customerlogin', 
   async (userdata,{rejectWithValue }) => {
   console.log('getLogin userdata:', userdata['mobileNumber'] + userdata['passowrd'])
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  }
   const user = {
     mobileNumber: userdata['mobileNumber'],
     passowrd: userdata['passowrd'] 
   }
-  // الاوصل الصالح مع try
- try { 
-    const res = await axios.post('http://localhost:5000/customerlogin', 
+  try {
+    const response = await axios
+    .post("http://localhost:5000/customerlogin", 
      //await axios.post('https://api.imagemarketing.net/Customerlogin', 
-      user
+      user,
+      config,
+      { withCredentials: true }
   )
- return res.data
+  console.log('Authenticated Customer successfully:', response.data.auth_CustomerToken);
+  console.log('response.data.data Customer :', response.data.rows);
+
+    return response.data
   
-} catch (error) {
-    // return custom error message from backend if present
-      if (error.response && error.response.data.message) {
-        return rejectWithValue(error.response.data.message)
-      } else {
-        return rejectWithValue(error.message)
-      }
+
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      return rejectWithValue(error.response.data.message)
+    } else {
+      return rejectWithValue(error.message)
     }
+  }
+
   
 })
 
@@ -137,49 +150,34 @@ export const CustomerLogOut = createAsyncThunk(
           .addCase(custlogin.fulfilled, (state, action) => {
             state.SignIn = true
             state.statusLogin = 'تم تسجيل الدخول  بنجاح'
-            console.log('action.payload.Email:',action.payload.Email)
-            state.CustomerEmail = action.payload.Email
-            state.phoneNumber = action.payload.MobileNumber
-            state.SCustID = action.payload.SCustID
-            state.CustomerId = action.payload.CustomerId
-            state.CustomerName = action.payload.CustomerName
-            state.AddressCity = action.payload.AddressCity
-            state.AddressStreet = action.payload.AddressStreet
-
-            
-            //localStorage.setItem("customerlogin", 'true');
-            //setAuth(true);
-             //navigate("/HomePage", { replace: true });
-
+            console.log('action.payload.Email:',action.payload.rows.Email)
+            state.CustomerEmail = action.payload.rows.Email
+            state.phoneNumber = action.payload.rows.MobileNumber
+            state.SCustID = action.payload.rows.SCustID
+            state.CustomerId = action.payload.rows.CustomerId
+            state.CustomerName = action.payload.rows.CustomerName
+            state.AddressCity = action.payload.rows.AddressCity
+            state.AddressStreet = action.payload.rows.AddressStreet
+            state.CustomerToken = action.payload.auth_CustomerToken
           })
           .addCase(custlogin.rejected, (state, action) => {
            // When data is fetched unsuccessfully
                 state.statusLogin = 'خطأ في تسجيل الدخول، قد يكون رقم تلفونك او ايميلك مسجل من قبل!!'
                 state.SignIn = false
                 state.errorLogin = true
-                //localStorage.setItem("persist:root", 'false');
-                //setAuth(true);
-                 //navigate("/customerlogin");
+                state.CustomerToken = null
           })
           .addCase(CustomerLogOut.fulfilled, (state, action) => {
-            state.SignIn = false
+            state.SignIn = false    
             state.statusLogin = 'تم تسجيل الخروج  '
-            //console.log('action.payload.Email:',action.payload.Email)
-            //state.CustomerEmail = action.payload.Email
-           // localStorage.setItem("loginCustomerStorage", 'false');
-            //setAuth(true);
-             //navigate("/HomePage", { replace: true });
-
+            state.CustomerToken = null
           })
           .addCase(CustomerLogOut.rejected, (state, action) => {
            // When data is fetched unsuccessfully
-                state.statusLogin = 'خطأ في تسجيل الخورج!'
+                state.statusLogin = '   خطأ في تسجيل الخروج!! تم تسجيل الخروج لحمايتك!'
                 state.SignIn = false
                 state.errorLogin = true
-                
-                //localStorage.setItem("loginCustomerStorage", 'false');
-                //setAuth(true);
-                 //navigate("/customerlogin");
+                state.CustomerToken = null
           })
           
           // and provide a default case if no other handlers matched

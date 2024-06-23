@@ -1,5 +1,7 @@
 var express = require('express')
 var cors = require('cors')
+const cookieParser = require('cookie-parser');
+
 const mysql = require('mysql');
 var https = require('https');
 var fs = require('fs');
@@ -8,6 +10,8 @@ var app = express()
 const bodyParser = require('body-parser')
 const db = require('./util/database')
 var jwt = require('jsonwebtoken');
+const { verifyAdminToken, verifyCustomerToken} = require('./middlewares/requireAuths')
+
 
 //const httpServer = http.createServer(app);
 var PORT = process.env.PORT || 5000;
@@ -21,6 +25,7 @@ const Gateway = require('./moduls/Gatways')
 const FetchForAndroidApp = require('./moduls/FetchForAndroidApp')
 const Control = require('./moduls/ControlPanel')
 const requireAuth = require('./moduls/requireAuths')
+
 /*
 var options = {
     key: fs.readFileSync( './alhjaji.com.key' ),
@@ -59,20 +64,31 @@ http.listen(port, () => {
 });
 app.use(cors())
 
+const corsOptions = {
+    origin:["http://localhost:3001"],
+   // credentials: true,
+    exposeHeaders:['Authorization']
+}
+app.use(cors(corsOptions));
+
+/*
   app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', ['http://localhost:3001','http://localhost:3000']);
+
     res.setHeader(
       'Access-Control-Allow-Methods',
-      'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+      'OPTIONS, GET, POST, PUT, PATCH, DELETE',
     );
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
   });
-
+*/
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 //app.disable('x-powered-by');
 app.use(express.json());
+// Use cookie parser middleware to parse cookies
+//app.use(cookieParser('c045acda77617205441ef2'));
 
     app.get("/",(req, res) => {
         //res.writeHead(200, {'Content-Type': 'text/plain'});
@@ -87,8 +103,8 @@ app.get("/H", (req,res) => {
 
 
 // Define a GET route
-app.get('/getire', (req, res) => {
-    // res.header('Content-type', 'application/json');
+app.get('/getire',verifyCustomerToken, (req, res) => {
+ 
     const result = product.fetchTires()
                     .then(([rows, fieldData]) => {
                         //console.log('result gettire:', rows[0], rows[1])
@@ -96,7 +112,7 @@ app.get('/getire', (req, res) => {
                         res.send(rows)
                     })
                     .catch(err => console.log('fetchTires err', err))
-
+                        
 });
 // Route to get one tire
 app.get("/getFromTireSize/:tiresize", (req,res)=> {
@@ -149,18 +165,24 @@ app.get("/geBatteries",(req, res) => {
 });
 
 // Route to get all BuyerRequests from  التطبيق
-app.get("/getBuyerRequest",(req, res) => {
+app.get('/getBuyerRequests', verifyAdminToken, (req, res) => {
     console.log('getBuyerRequest app' )
-
-    jwt.verify(req.token,'c045acda77617205441ef', (err)=>{
-        if(err)
-            res.sendStatus(403);
-        else{
-            console.log('jwt.verify req.token',req.token)
-        }
+     
+        const result = Requests.getBuyerRequest()
+        .then(([rows, fieldData]) => {
+            //res.send(rows)
+            res.send(rows);
+            console.log('rows getBuyerRequest:',rows)
+        })
+        .catch(err => {
+            res.status(400)
+             // res.json({ message: 'لا يوجد لديك صلاحيات' });
+            //res.send('get Buyers Request  error')
+            console.log('get Buyers Request error', err)
+        })
     })
-
     
+    /*
     const result = Requests.getBuyerRequest()
     .then(([rows]) => {
         res.send(rows)
@@ -170,8 +192,8 @@ app.get("/getBuyerRequest",(req, res) => {
         res.send('get Buyers Request  error')
         console.log('get Buyers Request error', err)
     })
-
-});
+*/
+//});
 
 
 // Route to get Dolar Yemeni
@@ -225,10 +247,10 @@ app.post("/kurimiusersReg",  (req, res, next)=>{
 
 });
     // تسجيل دخول لوحة تحكم موقع الويب
-    app.post('/adminlogin',(req, res) => {
+    app.post('/adminlogins',(req, res) => {
          //const JWT_SECRET = process.env.JWT_SECRET;
+         const JWT_SECRET = 'c045acda77617205441ef7';
          console.log('adminlogin posting')
-         const JWT_SECRET = 'c045acda77617205441ef';
          
             const email = req.body.email;
             const passowrd = String(req.body.passowrd);
@@ -244,13 +266,22 @@ app.post("/kurimiusersReg",  (req, res, next)=>{
                 .then(([rows, fieldData]) => {
                     console.log('email for token', rows[0].email)
                     const em = rows[0].email
-                    const token = jwt.sign({em}, JWT_SECRET);
-
-                    //return res
-                   // res.status(200)
-                   // .json({ message: "User Logged in Successfully", token })
-                    res.send(token)
-
+                      // Issue token
+          const payload = { em };
+     
+          const auth_token = jwt.sign({em},
+             JWT_SECRET,
+            //{expiresIn:'50h'}
+            );
+          console.log('auth_token server',auth_token)
+          // Set the cookie with the token
+            // res.cookie("Authorization",auth_token, {signed:true,maxAge:24000});
+            // Send the response back to the client
+           // res.cookie('name', 'GeeksForGeeks', { signed: true }).send(); 
+           // console.log('req.signedCookies',req.signedCookies) 
+            //res.send({auth_token: auth_token});
+            res.json({ auth_token: auth_token });
+                  //  const token = jwt.sign({em}, JWT_SECRET);
                       //Mock user
                 //res.send({token: token, rows})
                 // السابق الصالح قبل token
@@ -302,6 +333,10 @@ app.post("/kurimiusersReg",  (req, res, next)=>{
 
          // تسجيل دخول عملاء التجزئة   
          app.post('/customerlogin', async (req, res) => {
+            // KurimiUsers table
+            const JWT_SECRET = 'c045acda77617205441ef8';
+            console.log('customerlogin login...')
+
                 const mobileNumber = req.body.mobileNumber;
                 const passowrd = String(req.body.passowrd);
                 console.log('mobileNumber Customerlogin:', req.body )
@@ -310,8 +345,21 @@ app.post("/kurimiusersReg",  (req, res, next)=>{
                 .then(([rows, fieldData]) => {
                     console.log('result Customerlogin:', rows[0])
                     //res.status(200).json(rows);
-                    res.send(rows[0])
+                    // السابق الصالح قبل التوكن
+                   // res.send(rows[0])
+                    console.log('mobileNumber for token', rows[0].MobileNumber)
+                    const MobileNumber = rows[0].MobileNumber
                    // res.send(rows)
+                   const auth_CustomerToken = jwt.sign({MobileNumber},
+                    JWT_SECRET,
+                   //{expiresIn:'50h'}
+                   );
+                 console.log('auth_CustomerToken server',auth_CustomerToken)
+                 res.status(200).json({
+                    rows: rows[0],
+                    auth_CustomerToken: auth_CustomerToken
+                    });
+                // res.json({ auth_CustomerToken: auth_CustomerToken });
                 })
                 .catch(err => {
                     res.status(400);
